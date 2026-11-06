@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">Store bag mark</title>
+  <defs><linearGradient id="bag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#168BFF"/><stop offset="1" stop-color="#174FE0"/></linearGradient><linearGradient id="handle" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#56C7FF"/><stop offset="1" stop-color="#2786F6"/></linearGradient></defs>
+  <path d="M34 31v-7a14 14 0 0 1 28 0v7" fill="none" stroke="url(#handle)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M24 31h48a11 11 0 0 1 11 11v31a13 13 0 0 1-13 13H26a13 13 0 0 1-13-13V42a11 11 0 0 1 11-11Z" fill="url(#bag)"/>
+  <path d="m39 45-7 27m26-27-7 27M28 54h38M25 64h38" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round"/>
+</svg>

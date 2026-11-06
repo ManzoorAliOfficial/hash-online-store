@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 260" role="img" aria-labelledby="title desc">
+  <title id="title">Hash Online Store</title>
+  <desc id="desc">Blue shopping bag with a white hash symbol beside the Online Store wordmark.</desc>
+  <defs>
+    <linearGradient id="bag" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b7cff"/>
+      <stop offset="1" stop-color="#0a45e6"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(20 17) scale(0.5) translate(-302 -134)">
+    <path d="M412 265 V232 A98 98 0 0 1 608 232 V265" fill="none" stroke="#2f80ff" stroke-width="26" stroke-linecap="round"/>
+    <path d="M350 240 H677 Q706 240 708 270 L722 535 Q724 584 675 584 H350 Q300 584 302 535 L318 270 Q320 240 350 240 Z" fill="url(#bag)"/>
+    <g transform="translate(512 415) skewX(-12)" fill="#ffffff">
+      <rect x="-62" y="-107" width="40" height="215" rx="8"/>
+      <rect x="22" y="-107" width="40" height="215" rx="8"/>
+      <rect x="-110" y="-52" width="220" height="38" rx="8"/>
+      <rect x="-110" y="14" width="220" height="38" rx="8"/>
+    </g>
+  </g>
+  <text x="268" y="207" fill="#102449" font-family="Montserrat, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="44" font-weight="600" textLength="600" lengthAdjust="spacing">ONLINE STORE</text>
+</svg>
