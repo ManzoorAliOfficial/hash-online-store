@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useStore } from "../../context/StoreContext";
 import storeLogo from "../../assets/icons/Store.svg";
 import AnnouncementBar from "./AnnouncementBar";
+import SearchModal from "./SearchModal";
 
 const navClass = ({ isActive }) =>
   `text-base font-semibold transition hover:text-[#2563eb] ${isActive ? "text-[#2563eb]" : "text-[#43536c]"}`;
@@ -12,6 +13,7 @@ const mobileClass = ({ isActive }) =>
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { cart, wishlist, user } = useStore();
   const cartCount = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
   const close = () => setOpen(false);
@@ -69,17 +71,18 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-4 text-[#203653] max-[900px]:gap-2.5">
-          <Link
-            className="grid size-10 place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
-            to="/products"
+          <button
+            type="button"
+            className="grid size-10 cursor-pointer place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
+            onClick={() => setSearchOpen(true)}
             aria-label="Search products"
-            title="Search products"
+            title="Search products (Ctrl+K)"
           >
             <Search
               className="size-5 max-[900px]:size-[18px]"
               strokeWidth={2}
             />
-          </Link>
+          </button>
           <NavLink
             to="/wishlist"
             aria-label="Wishlist"
@@ -173,6 +176,8 @@ export default function Navbar() {
           </nav>
         )}
       </header>
+
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

@@ -1,0 +1,1 @@
+import{t as e}from"./AccountWrapper-CkTQNWbT.js";import{t}from"./LoginForm-BSuTYPKA.js";import{t as n}from"./jsx-runtime-DyZJNswf.js";var r=n();function i(){return(0,r.jsx)(e,{mode:`login`,children:(0,r.jsx)(t,{})})}export{i as default};

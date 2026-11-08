@@ -1,4 +1,10 @@
-import StorePage from "../components/Common/StorePage";
+import AccountWrapper from "../components/Auth/AccountWrapper";
+import LoginForm from "../components/Auth/LoginForm";
+
 export default function Login() {
-  return <StorePage view="login" />;
+  return (
+    <AccountWrapper mode="login">
+      <LoginForm />
+    </AccountWrapper>
+  );
 }

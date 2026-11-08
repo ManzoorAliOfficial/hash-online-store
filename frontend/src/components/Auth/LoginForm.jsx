@@ -1,11 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { useStore } from "../../context/StoreContext";
+
 export default function LoginForm() {
   const { loginCustomer } = useStore();
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+
   const submit = async (event) => {
     event.preventDefault();
     setMessage("");
@@ -19,7 +32,7 @@ export default function LoginForm() {
       });
 
       if (!result?.ok) {
-        setMessage(result?.error || "Unable to sign in. Please try again.");
+        setMessage(result?.error || "Unable to sign in. Please verify your credentials.");
         return;
       }
 
@@ -32,52 +45,126 @@ export default function LoginForm() {
   };
 
   return (
-    <form className="grid gap-4" onSubmit={submit}>
-      <label className="grid gap-1.5 text-xs font-semibold text-[#34445f]">
-        Email address
-        <input
-          className="h-11 rounded-lg border border-[#dce5f3] px-3 text-sm font-normal outline-none focus:border-[#2563eb]"
-          type="email"
-          name="email"
-          required
-          autoComplete="email"
-          placeholder="you@example.com"
-        />
-      </label>
-      <label className="grid gap-1.5 text-xs font-semibold text-[#34445f]">
-        Password
-        <input
-          className="h-11 rounded-lg border border-[#dce5f3] px-3 text-sm font-normal outline-none focus:border-[#2563eb]"
-          type="password"
-          name="password"
-          required
-          autoComplete="current-password"
-          placeholder="Your password"
-        />
-      </label>
-      <Link
-        className="w-fit text-xs font-semibold text-[#2563eb] hover:text-[#174fcc]"
-        to="/forgot-password"
-      >
-        Forgot password?
-      </Link>
-      <button
-        className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#2563eb] px-5 text-xs font-bold text-white transition hover:bg-[#174fcc] disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={busy}
-      >
-        {busy ? "Signing in…" : "Sign in"}
-      </button>
+    <form className="space-y-4" onSubmit={submit} noValidate>
       {message && (
-        <p className="text-xs text-[#d14343]" role="alert">
-          {message}
-        </p>
+        <div
+          className="flex items-start gap-2.5 rounded-xl border border-[#fecaca] bg-[#fff1f1] p-3.5 text-xs font-semibold text-[#d14343]"
+          role="alert"
+        >
+          <AlertCircle size={16} className="mt-0.5 shrink-0" />
+          <span>{message}</span>
+        </div>
       )}
-      <p className="text-xs text-[#71809a]">
+
+      {/* Email Field */}
+      <div className="space-y-1.5">
+        <label
+          htmlFor="login-email"
+          className="block text-xs font-bold text-[#17233b]"
+        >
+          Email address
+        </label>
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8491a5]">
+            <Mail size={17} />
+          </div>
+          <input
+            id="login-email"
+            className="h-12 w-full rounded-xl border border-[#dce5f3] bg-[#f8fafd] pl-10 pr-4 text-sm text-[#17233b] placeholder:text-[#94a3b8] outline-none transition duration-150 focus:border-[#2563eb] focus:bg-white focus:ring-4 focus:ring-[#2563eb]/10"
+            type="email"
+            name="email"
+            required
+            autoComplete="email"
+            placeholder="you@example.com"
+          />
+        </div>
+      </div>
+
+      {/* Password Field */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="login-password"
+            className="block text-xs font-bold text-[#17233b]"
+          >
+            Password
+          </label>
+          <Link
+            className="cursor-pointer text-xs font-bold text-[#2563eb] transition hover:text-[#174fcc] hover:underline"
+            to="/forgot-password"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8491a5]">
+            <Lock size={17} />
+          </div>
+          <input
+            id="login-password"
+            className="h-12 w-full rounded-xl border border-[#dce5f3] bg-[#f8fafd] pl-10 pr-11 text-sm text-[#17233b] placeholder:text-[#94a3b8] outline-none transition duration-150 focus:border-[#2563eb] focus:bg-white focus:ring-4 focus:ring-[#2563eb]/10"
+            type={showPassword ? "text" : "password"}
+            name="password"
+            required
+            autoComplete="current-password"
+            placeholder="Enter your password"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3.5 text-[#8491a5] transition hover:text-[#2563eb]"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Remember Me */}
+      <div className="flex items-center justify-between pt-0.5">
+        <label className="flex cursor-pointer items-center gap-2 select-none">
+          <input
+            type="checkbox"
+            name="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="size-4 cursor-pointer rounded border-[#cbd5e1] text-[#2563eb] accent-[#2563eb] focus:ring-[#2563eb]"
+          />
+          <span className="text-xs font-medium text-[#52617a]">
+            Remember me on this device
+          </span>
+        </label>
+      </div>
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={busy}
+        className="inline-flex min-h-[48px] w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-5 text-sm font-bold text-white shadow-md shadow-[#2563eb]/20 transition-all duration-150 hover:bg-[#174fcc] hover:shadow-lg hover:shadow-[#2563eb]/25 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {busy ? (
+          <>
+            <Loader2 size={17} className="animate-spin" />
+            <span>Signing in...</span>
+          </>
+        ) : (
+          <>
+            <span>Sign In</span>
+            <ArrowRight size={16} />
+          </>
+        )}
+      </button>
+
+      {/* Register Link */}
+      <div className="pt-2 text-center text-xs text-[#71809a]">
         New to Hash Store?{" "}
-        <Link className="font-bold text-[#2563eb]" to="/register">
+        <Link
+          className="cursor-pointer font-bold text-[#2563eb] transition hover:text-[#174fcc] hover:underline"
+          to="/register"
+        >
           Create an account
         </Link>
-      </p>
+      </div>
     </form>
   );
 }

@@ -33,13 +33,21 @@ export default function ProductCard({ product }) {
   const saved = wishlist.includes(product.id);
   const quantity = cart.find((item) => item.id === product.id)?.qty || 0;
   const available = Number(product.stock || 0) > quantity;
+  const hasDiscount = Number(product.oldPrice) > Number(product.price);
+  const discountPercent = hasDiscount
+    ? Math.round(
+        ((Number(product.oldPrice) - Number(product.price)) /
+          Number(product.oldPrice)) *
+          100,
+      )
+    : 0;
   const buyNow = () => {
     if (addToCart(product.id)) navigate("/checkout");
   };
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-xl border border-[#edf0f5] bg-white transition-all duration-200 hover:-translate-y-1 hover:border-[#bfd4ff] hover:shadow-[0_14px_30px_rgba(16,36,73,0.08)]">
-      <div className="relative grid h-[180px] w-full place-items-center overflow-hidden bg-[#f4f7fc]">
+      <div className="relative grid h-[180px] w-full place-items-center overflow-hidden bg-[#f8fafc]">
         <Link
           to={`/products/${product.id}`}
           aria-label={`View ${product.name}`}
@@ -61,14 +69,18 @@ export default function ProductCard({ product }) {
             />
           )}
         </Link>
-        {product.badge && (
-          <span className="absolute left-[11px] top-[11px] rounded bg-white/95 px-[7px] py-[4px] text-[9px] font-bold tracking-wider uppercase text-[#2563eb] shadow-xs backdrop-blur-xs">
+        {hasDiscount ? (
+          <span className="absolute left-2.5 top-2.5 inline-flex h-9 items-center justify-center rounded-lg border border-[#d2f0da] bg-[#e9f8ed] px-2.5 text-[11px] font-bold tracking-wide text-[#16803b] shadow-xs">
+            {discountPercent}% OFF
+          </span>
+        ) : product.badge ? (
+          <span className="absolute left-2.5 top-2.5 inline-flex h-9 items-center justify-center rounded-lg border border-[#dbe7ff] bg-white/95 px-2.5 text-[10px] font-bold tracking-wider uppercase text-[#2563eb] shadow-xs backdrop-blur-xs">
             {product.badge}
           </span>
-        )}
+        ) : null}
         <button
           type="button"
-          className={`absolute right-2.5 top-[9px] grid size-[30px] place-items-center rounded-full bg-white shadow-xs transition hover:scale-110 active:scale-95 ${saved ? "text-[#e5484d]" : "text-[#66758e] hover:text-[#e5484d]"}`}
+          className={`absolute right-2.5 top-2.5 grid size-9 cursor-pointer place-items-center rounded-lg border border-[#e8eff9] bg-white shadow-xs transition hover:scale-105 hover:border-[#cbd9f1] active:scale-95 ${saved ? "text-[#e5484d]" : "text-[#66758e] hover:text-[#e5484d]"}`}
           aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={saved}
           onClick={() => toggleWishlist(product.id)}
@@ -117,7 +129,7 @@ export default function ProductCard({ product }) {
         <div className="mt-auto grid grid-cols-2 gap-2 pt-2">
           <button
             type="button"
-            className="inline-flex min-h-[36px] items-center justify-center gap-1 rounded-[7px] bg-[#eff4ff] px-2 text-[11px] font-bold text-[#2563eb] transition hover:bg-[#dce9ff] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[#dbe7ff] bg-[#eff4ff] px-2 text-[11px] font-bold text-[#2563eb] transition hover:bg-[#dce9ff] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!available}
             onClick={() => addToCart(product.id)}
           >
@@ -126,7 +138,7 @@ export default function ProductCard({ product }) {
           </button>
           <button
             type="button"
-            className="inline-flex min-h-[36px] items-center justify-center gap-1 rounded-[7px] bg-[#2563eb] px-2 text-[11px] font-bold text-white transition hover:bg-[#174fcc] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-[#2563eb] px-2 text-[11px] font-bold text-white transition hover:bg-[#174fcc] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!available}
             onClick={buyNow}
           >

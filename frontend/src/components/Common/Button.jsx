@@ -14,7 +14,7 @@ export default function Button({
 }) {
   return (
     <button
-      className={`inline-flex min-h-[42px] items-center justify-center gap-2 rounded-[9px] px-[17px] py-[13px] text-[13px] font-bold transition duration-200 hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff] motion-reduce:transition-none sm:text-xs ${full ? "w-full" : ""} ${variants[variant] || variants.primary} ${className}`}
+      className={`inline-flex min-h-[42px] cursor-pointer items-center justify-center gap-2 rounded-[9px] px-[17px] py-[13px] text-[13px] font-bold transition duration-200 hover:-translate-y-px focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff] disabled:cursor-not-allowed disabled:opacity-50 motion-reduce:transition-none sm:text-xs ${full ? "w-full" : ""} ${variants[variant] || variants.primary} ${className}`}
       {...props}
     >
       {children}

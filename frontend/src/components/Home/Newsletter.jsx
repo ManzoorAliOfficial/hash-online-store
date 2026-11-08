@@ -1,51 +1,84 @@
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Mail, Gift, CheckCircle2 } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
+
 export default function Newsletter() {
   const { subscribe } = useStore();
   const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+
   const submit = (event) => {
     event.preventDefault();
     const email = new FormData(event.currentTarget).get("email");
-    setMessage(
-      subscribe(email)
-        ? "Thanks for subscribing."
-        : "Please enter your email address.",
-    );
-    if (email) event.currentTarget.reset();
+    if (subscribe(email)) {
+      setMessage("Welcome aboard! Use voucher code HASH500 on your first order.");
+      setSuccess(true);
+      event.currentTarget.reset();
+    } else {
+      setMessage("Please enter a valid email address.");
+      setSuccess(false);
+    }
   };
+
   return (
-    <form
-      className="mx-auto mb-[75px] grid max-w-[1120px] grid-cols-[1fr_minmax(190px,300px)_auto] items-center gap-3 rounded-2xl bg-[#102449] px-[7%] py-8 text-white max-[900px]:mx-[5%] max-[700px]:grid-cols-1 max-[600px]:mx-4 max-[600px]:mb-[52px]"
-      onSubmit={submit}
+    <section
+      aria-label="Newsletter sign up"
+      className="mx-auto mb-[75px] max-w-[1120px] rounded-3xl border border-white/10 bg-gradient-to-br from-[#0c1f44] via-[#102449] to-[#0a1835] px-8 py-10 text-white shadow-[0_16px_40px_rgba(16,36,73,0.12)] sm:px-12 sm:py-12 max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-[52px] max-[600px]:p-6"
     >
-      <div>
-        <span className="text-[10px] font-extrabold tracking-[.14em] text-[#a9c6ff]">
-          THE HASH STORE EDIT
-        </span>
-        <h3 className="mt-2 text-[25px] font-bold tracking-[-.04em]">
-          Good things, delivered.
-        </h3>
-        <p className="mt-1 text-xs text-[#c6d5ee]">
-          Get product news and special offers in your inbox.
-        </p>
+      <div className="grid grid-cols-[1.2fr_1fr] items-center gap-8 max-[850px]:grid-cols-1 max-[850px]:gap-6">
+        <div>
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-extrabold tracking-[.14em] text-[#a9c6ff]">
+            <Gift size={13} className="text-[#60a5fa]" />
+            <span>WELCOME REWARD</span>
+          </div>
+          <h3 className="mt-3 text-2xl font-extrabold tracking-[-.04em] text-white sm:text-3xl max-[600px]:text-xl">
+            Get Rs. 500 OFF your first order.
+          </h3>
+          <p className="mt-2 text-xs leading-relaxed text-[#c6d5ee] sm:text-sm">
+            Subscribe to our newsletter for exclusive weekly product drops, secret flash sales, and tech guides.
+          </p>
+        </div>
+
+        <div>
+          <form
+            className="flex flex-col gap-2.5 sm:flex-row"
+            onSubmit={submit}
+          >
+            <div className="relative flex-1">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8491a5]">
+                <Mail size={16} />
+              </div>
+              <input
+                className="h-12 w-full rounded-xl border border-white/20 bg-white/95 pl-10 pr-4 text-xs font-medium text-[#17233b] placeholder:text-[#8491a5] outline-none transition focus:border-[#7dafff] focus:bg-white focus:ring-4 focus:ring-[#7dafff]/30"
+                name="email"
+                type="email"
+                required
+                placeholder="Enter your email address"
+                aria-label="Email address"
+              />
+            </div>
+            <button
+              type="submit"
+              className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-6 text-xs font-bold text-white shadow-md shadow-[#2563eb]/20 transition hover:bg-[#174a93] active:scale-98"
+            >
+              <span>Subscribe</span>
+              <ArrowRight size={15} />
+            </button>
+          </form>
+
+          {message && (
+            <div
+              className={`mt-3 flex items-center gap-2 text-xs font-semibold ${
+                success ? "text-[#86efac]" : "text-[#fca5a5]"
+              }`}
+              role="status"
+            >
+              {success && <CheckCircle2 size={15} className="shrink-0" />}
+              <span>{message}</span>
+            </div>
+          )}
+        </div>
       </div>
-      <input
-        className="h-11 w-full rounded-lg border border-white/20 bg-white px-3 text-xs text-[#17233b] outline-none ring-0 placeholder:text-[#8491a5] focus:border-[#7dafff] focus:ring-2 focus:ring-[#7dafff]/35"
-        name="email"
-        type="email"
-        required
-        placeholder="Email address"
-        aria-label="Email address"
-      />
-      <button className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#2563eb] px-5 text-xs font-bold text-white transition hover:bg-[#1f55cf]">
-        Subscribe <ArrowRight size={15} />
-      </button>
-      {message && (
-        <span role="status" className="col-span-full text-xs text-[#b6d2ff]">
-          {message}
-        </span>
-      )}
-    </form>
+    </section>
   );
 }

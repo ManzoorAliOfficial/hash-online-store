@@ -1,8 +1,57 @@
 import { Link } from "react-router";
 import { useState } from "react";
-import { ArrowRight, Mail, Phone } from "lucide-react";
+import {
+  ArrowRight,
+  Mail,
+  Phone,
+  Banknote,
+  ShieldCheck,
+  Truck,
+  Package,
+  Zap,
+} from "lucide-react";
 import storeLogo from "../../assets/icons/hash-online-store-wordmark.svg";
 import { useStore } from "../../context/StoreContext";
+
+function VisaLogo({ className = "h-3 w-auto" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 36 12"
+      fill="none"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M14.28 1.15L11.75 11.23H9.42L11.95 1.15H14.28ZM24.49 7.42C24.5 4.6 20.6 4.45 20.63 3.25C20.64 2.88 20.99 2.48 21.78 2.37C22.17 2.32 23.27 2.27 24.5 2.84L24.93 0.84C24.34 0.63 23.59 0.44 22.65 0.44C19.98 0.44 18.09 1.86 18.07 3.88C18.05 5.38 19.39 6.22 20.41 6.72C21.46 7.23 21.81 7.57 21.8 8.03C21.79 8.74 20.95 9.05 20.18 9.06C18.94 9.07 18.22 8.71 17.65 8.44L17.2 10.53C17.78 10.8 18.84 11.03 19.94 11.05C22.77 11.05 24.48 9.66 24.49 7.42ZM31.69 11.23H33.72L32.06 1.15H30.18C29.74 1.15 29.38 1.4 29.21 1.81L24.96 11.23H27.41L27.9 9.87H30.9L31.18 11.23H31.69ZM28.58 7.96L29.83 4.54L30.55 7.96H28.58ZM7.92 1.15L5.7 8.03L5.46 6.84C5.07 5.51 3.84 4.07 2.49 3.37L4.54 11.22H7.01L10.68 1.15H7.92Z"
+        fill="#1434CB"
+      />
+      <path
+        d="M3.73 1.15H0.14L0.1 1.34C2.89 2.05 4.73 3.77 5.48 5.76L4.69 1.76C4.55 1.25 4.19 1.16 3.73 1.15Z"
+        fill="#F9A51A"
+      />
+    </svg>
+  );
+}
+
+function MastercardLogo({ className = "h-3.5 w-auto" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 16"
+      fill="none"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="7" cy="8" r="6" fill="#EB001B" />
+      <circle cx="15" cy="8" r="6" fill="#F79E1B" fillOpacity="0.9" />
+      <path
+        d="M11 3.55C12.23 4.67 13 6.24 13 8C13 9.76 12.23 11.33 11 12.45C9.77 11.33 9 9.76 9 8C9 6.24 9.77 4.67 11 3.55Z"
+        fill="#FF5F00"
+      />
+    </svg>
+  );
+}
 
 function BrandIcon({ name, className = "" }) {
   if (name === "instagram")
@@ -105,7 +154,7 @@ export default function Footer() {
   return (
     <footer
       id="footer"
-      className="mt-auto bg-[#f7f9fc] px-[max(calc((100vw-1120px)/2),5%)] pt-[43px] text-[#728097] max-[600px]:px-4"
+      className="mt-auto border-t border-[#e2e8f0] bg-[#f5f8fd] px-[max(calc((100vw-1120px)/2),5%)] pt-[43px] text-[#728097] max-[600px]:px-4"
     >
       <div className="grid grid-cols-[1.3fr_.8fr_.9fr_1.2fr] gap-[35px] pb-8 max-[800px]:grid-cols-2 max-[600px]:grid-cols-1">
         <div>
@@ -136,7 +185,7 @@ export default function Footer() {
               {socialLinks.map((item) => (
                 <li key={item.name}>
                   <a
-                    className="group relative inline-flex size-9 items-center justify-center rounded-lg border border-[#e3e8f0] bg-white text-[#52617a] transition duration-200 hover:-translate-y-0.5 hover:border-[#102449] hover:bg-[#102449] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                    className="group relative inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-[#e3e8f0] bg-white text-[#52617a] transition duration-200 hover:-translate-y-0.5 hover:border-[#102449] hover:bg-[#102449] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                     href={item.href}
                     aria-label={item.name}
                     target="_blank"
@@ -227,7 +276,7 @@ export default function Footer() {
               placeholder="Your email address"
             />
             <button
-              className="grid size-[31px] place-items-center rounded bg-[#2563eb] text-white transition hover:bg-[#174fcc]"
+              className="grid size-[31px] cursor-pointer place-items-center rounded bg-[#2563eb] text-white transition hover:bg-[#174fcc]"
               aria-label="Subscribe"
             >
               <ArrowRight size={15} />
@@ -241,6 +290,52 @@ export default function Footer() {
               {message}
             </small>
           )}
+        </div>
+      </div>
+      {/* Verified Trust & Payment Partners Bar */}
+      <div className="border-t border-[#e9edf3] py-5">
+        <div className="flex flex-wrap items-center justify-between gap-y-3.5 gap-x-6 text-[11px]">
+          {/* Payment Methods */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="font-bold text-[#17233b]">Payment Methods:</span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Banknote size={14} className="text-[#16803b]" />
+                <span>Cash on Delivery</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <VisaLogo className="h-3 w-auto" />
+                <span>Visa</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <MastercardLogo className="h-3.5 w-auto" />
+                <span>Mastercard</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#dbeafe] bg-[#f0f7ff] px-2.5 py-1 text-[11px] font-semibold text-[#1d4ed8] shadow-2xs transition hover:border-[#bfdbfe]">
+                <ShieldCheck size={14} className="text-[#2563eb]" />
+                <span>256-Bit SSL Encrypted</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Courier Partners */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="font-bold text-[#17233b]">Courier Partners:</span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Truck size={14} className="text-[#dc2626]" />
+                <span>TCS Express</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Package size={14} className="text-[#d97706]" />
+                <span>Trax Logistics</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Zap size={14} className="text-[#ca8a04]" />
+                <span>Leopard Courier</span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
       <div className="flex flex-wrap justify-between gap-3 border-t border-[#e9edf3] py-4 text-[9px] text-[#8a96a8]">

@@ -1,0 +1,1 @@
+import{t as e}from"./AdminPage-DuNWudEo.js";import{t}from"./jsx-runtime-DyZJNswf.js";var n=t();function r(){return(0,n.jsx)(e,{page:`Coupons`})}export{r as default};

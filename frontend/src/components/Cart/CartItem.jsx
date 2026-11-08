@@ -30,6 +30,15 @@ export default function CartItem({ item }) {
   const Icon = icons[product.icon] || Smartphone;
   const isMaxStock = item.qty >= Number(product.stock || 0);
 
+  const hasDiscount = Number(product.oldPrice) > Number(product.price);
+  const discountPercent = hasDiscount
+    ? Math.round(
+        ((Number(product.oldPrice) - Number(product.price)) /
+          Number(product.oldPrice)) *
+          100,
+      )
+    : 0;
+
   return (
     <article className="grid grid-cols-[76px_minmax(0,1fr)_auto_auto] items-center gap-4 border-b border-[#edf0f5] py-4 last:border-b-0 max-[600px]:grid-cols-[58px_minmax(0,1fr)_auto] max-[600px]:gap-3">
       <div className="grid size-[68px] place-items-center overflow-hidden rounded-lg border border-[#eef2f8] bg-[#f4f7fc] max-[600px]:size-[54px]">
@@ -56,7 +65,7 @@ export default function CartItem({ item }) {
           {product.category}
         </small>
         <button
-          className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#d14343] transition hover:text-[#ae2d35]"
+          className="mt-2 inline-flex cursor-pointer items-center gap-1 text-[11px] font-semibold text-[#d14343] transition hover:text-[#ae2d35]"
           type="button"
           onClick={() => removeFromCart(product.id)}
         >
@@ -69,7 +78,7 @@ export default function CartItem({ item }) {
         aria-label={`Quantity for ${product.name}`}
       >
         <button
-          className="grid size-8 place-items-center text-[#52617a] transition hover:text-[#2563eb] disabled:opacity-30"
+          className="grid size-8 cursor-pointer place-items-center text-[#52617a] transition hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-30"
           type="button"
           aria-label="Decrease quantity"
           onClick={() => setQty(product.id, item.qty - 1)}
@@ -81,7 +90,7 @@ export default function CartItem({ item }) {
           {item.qty}
         </span>
         <button
-          className="grid size-8 place-items-center text-[#52617a] transition hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-30"
+          className="grid size-8 cursor-pointer place-items-center text-[#52617a] transition hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-30"
           type="button"
           aria-label="Increase quantity"
           onClick={() => setQty(product.id, item.qty + 1)}
@@ -94,9 +103,21 @@ export default function CartItem({ item }) {
         </button>
       </div>
 
-      <b className="whitespace-nowrap text-sm font-bold text-[#17233b] max-[600px]:col-start-3">
-        {money(product.price * item.qty)}
-      </b>
+      <div className="flex flex-col items-end justify-center text-right max-[600px]:col-start-3 max-[600px]:items-end">
+        {hasDiscount && (
+          <div className="mb-0.5 flex flex-wrap items-center justify-end gap-1.5">
+            <span className="inline-flex items-center rounded bg-[#e9f8ed] px-1.5 py-0.5 text-[10px] font-bold text-[#16803b]">
+              {discountPercent}% OFF
+            </span>
+            <del className="text-xs font-medium text-[#a3adbb]">
+              {money(product.oldPrice * item.qty)}
+            </del>
+          </div>
+        )}
+        <b className="whitespace-nowrap text-sm font-bold text-[#17233b]">
+          {money(product.price * item.qty)}
+        </b>
+      </div>
     </article>
   );
 }

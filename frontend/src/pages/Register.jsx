@@ -1,4 +1,10 @@
-import StorePage from "../components/Common/StorePage";
+import AccountWrapper from "../components/Auth/AccountWrapper";
+import RegisterForm from "../components/Auth/RegisterForm";
+
 export default function Register() {
-  return <StorePage view="register" />;
+  return (
+    <AccountWrapper mode="register">
+      <RegisterForm />
+    </AccountWrapper>
+  );
 }

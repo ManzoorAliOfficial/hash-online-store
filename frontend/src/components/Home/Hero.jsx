@@ -9,11 +9,15 @@ import {
   Play,
   Smartphone,
   Star,
+  TrendingUp,
+  Sparkles,
 } from "lucide-react";
 import { Link } from "react-router";
 const slides = [
   {
     eyebrow: "THE SMARTER WAY TO SHOP",
+    badgeText: "Flagship 2026",
+    startingPrice: "Rs. 79,999",
     title: "Good finds.",
     highlight: "Better living.",
     description:
@@ -30,6 +34,8 @@ const slides = [
   },
   {
     eyebrow: "SOUND FOR EVERY MOMENT",
+    badgeText: "Spatial Audio",
+    startingPrice: "Rs. 19,999",
     title: "Listen closer.",
     highlight: "Tune everything out.",
     description:
@@ -37,15 +43,17 @@ const slides = [
     image:
       "https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=900&h=1000&q=85",
     accent:
-      "https://images.unsplash.com/photo-1733556046403-2d090cf359a3?auto=format&fit=crop&w=700&h=700&q=85",
+      "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&h=700&q=85",
     alt: "Premium headphones",
-    accentAlt: "Wireless earbuds",
+    accentAlt: "Portable Bluetooth speaker",
     icon: Headphones,
     label: "Audio favorites",
     caption: "Your sound, your space",
   },
   {
     eyebrow: "READY FOR WHAT’S NEXT",
+    badgeText: "M2 Performance",
+    startingPrice: "Rs. 149,999",
     title: "Make room for",
     highlight: "a better workflow.",
     description:
@@ -87,7 +95,7 @@ export default function Hero() {
     setActive((i) => (i + step + slides.length) % slides.length);
   return (
     <section
-      className="relative mx-auto mt-8 grid min-h-[480px] max-w-[1200px] grid-cols-2 overflow-hidden rounded-[22px] bg-[#f2f6fc] max-[900px]:mx-[4%] max-[900px]:mt-5 max-[900px]:min-h-[400px] max-[600px]:mx-3 max-[600px]:mt-3 max-[600px]:grid-cols-1 max-[600px]:min-h-0"
+      className="relative mx-auto mt-8 grid min-h-[480px] max-w-[1200px] grid-cols-2 overflow-hidden rounded-[22px] border border-[#e2e8f0] bg-white shadow-[0_4px_24px_rgba(15,23,42,0.03)] max-[900px]:mx-[4%] max-[900px]:mt-5 max-[900px]:min-h-[400px] max-[600px]:mx-3 max-[600px]:mt-3 max-[600px]:grid-cols-1 max-[600px]:min-h-0"
       aria-roledescription="carousel"
       aria-label="Featured products"
       onMouseEnter={() => setHovered(true)}
@@ -109,9 +117,16 @@ export default function Hero() {
         aria-label={`${active + 1} of ${slides.length}`}
         aria-live={hovered || focused || paused ? "polite" : "off"}
       >
-        <span className="text-[10px] font-extrabold tracking-[.14em] text-[#2563eb]">
-          {slide.eyebrow}
-        </span>
+        <div className="inline-flex items-center gap-2 rounded-full border border-[#dce5f3] bg-white px-3 py-1 text-[11px] font-bold text-[#17233b] shadow-2xs">
+          <span className="size-2 rounded-full bg-[#16803b] animate-pulse" />
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#2563eb]">
+            {slide.eyebrow}
+          </span>
+          <span className="text-[#c1cbd8]">·</span>
+          <span className="text-xs font-semibold text-[#52617a]">
+            From {slide.startingPrice}
+          </span>
+        </div>
         <h1 className="my-4 text-[clamp(44px,5vw,66px)] leading-[1.02] tracking-[-.06em] max-[600px]:text-[43px]">
           {slide.title}
           <br />
@@ -122,19 +137,19 @@ export default function Hero() {
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#2563eb] px-[17px] py-[13px] text-xs font-bold text-white transition hover:-translate-y-px hover:bg-[#174a93] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff]"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#2563eb] px-[17px] py-[13px] text-xs font-bold text-white transition hover:-translate-y-px hover:bg-[#174a93] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff]"
             to="/products"
           >
             Shop products <ArrowRight size={16} />
           </Link>
           <a
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#e1e7f0] bg-white px-[17px] py-[13px] text-xs font-bold text-[#20304b] transition hover:-translate-y-px hover:border-[#aac4f3] hover:bg-[#f2f6ff] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff]"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#e1e7f0] bg-white px-[17px] py-[13px] text-xs font-bold text-[#20304b] transition hover:-translate-y-px hover:border-[#aac4f3] hover:bg-[#f2f6ff] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff]"
             href="#categories"
           >
             Explore categories
           </a>
         </div>
-        <div className="mt-[30px] flex items-center gap-3 text-[11px] text-[#61708a]">
+        <div className="mt-[26px] flex items-center gap-3 text-[11px] text-[#61708a]">
           <span className="inline-flex items-center gap-1.5">
             <Star size={14} fill="currentColor" />
             <b className="text-[#17233b]">4.9/5</b> customer rating
@@ -145,9 +160,28 @@ export default function Hero() {
             ))}
           </span>
         </div>
+        <div className="mt-4 flex flex-wrap items-center gap-1.5 text-[11px] text-[#61708a] max-[600px]:mt-3">
+          <span className="flex items-center gap-1 font-bold text-[#17233b]">
+            <TrendingUp size={13} className="text-[#2563eb]" /> Trending:
+          </span>
+          {[
+            { label: "AirPods Pro 2", to: "/products/p2" },
+            { label: "iPhone 15 Pro", to: "/products?search=iPhone" },
+            { label: "MacBook Air", to: "/products?search=MacBook" },
+            { label: "Smart Watches", to: "/products?category=Wearables" },
+          ].map((chip) => (
+            <Link
+              key={chip.label}
+              to={chip.to}
+              className="inline-flex cursor-pointer items-center rounded-full border border-[#dce5f3] bg-white/90 px-2.5 py-0.5 text-[10px] font-semibold text-[#43536c] transition hover:border-[#2563eb] hover:bg-[#eff4ff] hover:text-[#2563eb]"
+            >
+              {chip.label}
+            </Link>
+          ))}
+        </div>
       </div>
       <div
-        className="relative grid min-h-[420px] place-items-center bg-[radial-gradient(ellipse_at_55%_48%,#d9e7ff_0,#edf3fd_48%,#f2f6fc_75%)] max-[900px]:min-h-[360px] max-[600px]:min-h-[280px] max-[600px]:pb-[27px]"
+        className="relative grid min-h-[420px] place-items-center bg-[radial-gradient(ellipse_at_55%_48%,#d9e7ff_0,#edf3fd_48%,#ffffff_75%)] max-[900px]:min-h-[360px] max-[600px]:min-h-[280px] max-[600px]:pb-[27px]"
         key={`visual-${active}`}
       >
         <div className="absolute size-[280px] rounded-full bg-[linear-gradient(145deg,#d4e4ff,#b7d0ff)] blur-[1px] max-[600px]:size-[210px]" />
@@ -189,10 +223,18 @@ export default function Hero() {
             />
           )}
         </div>
-        <div className="absolute right-[13%] top-[14%] z-[2] grid size-[75px] content-center rounded-full bg-white text-center text-[9px] text-[#2563eb] shadow-[0_8px_20px_#17233b12]">
-          NEW
-          <br />
-          <b className="text-[10px]">ARRIVALS</b>
+        <div className="absolute right-[10%] top-[12%] z-[2] flex items-center gap-2.5 rounded-2xl border border-white/70 bg-white/95 px-3.5 py-2 shadow-[0_12px_24px_rgba(23,35,59,0.12)] backdrop-blur-md max-[600px]:right-[6%] max-[600px]:top-[8%] max-[600px]:px-2.5 max-[600px]:py-1.5">
+          <div className="grid size-7 place-items-center rounded-xl bg-[#eff4ff] text-[#2563eb] max-[600px]:size-6">
+            <Sparkles size={14} className="max-[600px]:size-3.5" />
+          </div>
+          <div className="text-left">
+            <span className="block text-[9px] font-extrabold uppercase tracking-wider text-[#2563eb] max-[600px]:text-[8px]">
+              {slide.badgeText}
+            </span>
+            <b className="block text-[11px] font-bold text-[#17233b] max-[600px]:text-[10px]">
+              From {slide.startingPrice}
+            </b>
+          </div>
         </div>
         <div className="absolute bottom-[23px] left-[30px] right-[30px] flex justify-between rounded-[10px] bg-[#ffffffd9] px-4 py-3 text-[11px] text-[#66758e] backdrop-blur-[8px] max-[600px]:bottom-[42px]">
           <span>{slide.label}</span>
@@ -208,7 +250,7 @@ export default function Hero() {
           {slides.map((item, index) => (
             <button
               key={item.eyebrow}
-              className={`size-[7px] rounded-full border-0 bg-[#a9b9d3] p-0 transition-[width,background] ${index === active ? "w-5 rounded-[5px] bg-[#2563eb]" : ""}`}
+              className={`size-[7px] cursor-pointer rounded-full border-0 bg-[#a9b9d3] p-0 transition-[width,background] ${index === active ? "w-5 rounded-[5px] bg-[#2563eb]" : ""}`}
               aria-label={`Show slide ${index + 1}: ${item.eyebrow}`}
               aria-current={index === active ? "true" : undefined}
               onClick={() => setActive(index)}
@@ -216,21 +258,21 @@ export default function Hero() {
           ))}
         </div>
         <button
-          className="grid size-[30px] place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white max-[600px]:size-[27px]"
+          className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white max-[600px]:size-[27px]"
           onClick={() => go(-1)}
           aria-label="Previous slide"
         >
           <ChevronLeft size={17} />
         </button>
         <button
-          className="grid size-[30px] place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white max-[600px]:size-[27px]"
+          className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white max-[600px]:size-[27px]"
           onClick={() => go(1)}
           aria-label="Next slide"
         >
           <ChevronRight size={17} />
         </button>
         <button
-          className="grid size-[30px] place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white max-[600px]:size-[27px]"
+          className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white max-[600px]:size-[27px]"
           onClick={() => setPaused((p) => !p)}
           aria-label={paused ? "Play slideshow" : "Pause slideshow"}
         >

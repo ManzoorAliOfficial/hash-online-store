@@ -456,7 +456,22 @@ const C = createContext(null);
 const safeRead = (key, fallback) => {
   try {
     const value = JSON.parse(localStorage.getItem(key));
-    return value ?? fallback;
+    if (value === null || value === undefined) return fallback;
+    if (
+      Array.isArray(fallback) &&
+      Array.isArray(value) &&
+      value.length === 0 &&
+      fallback.length > 0
+    ) {
+      return fallback;
+    }
+    if (key === "hash-coupons" && Array.isArray(value)) {
+      if (!value.some((c) => c.code === "HASH500")) {
+        const hash500 = defaultCoupons.find((c) => c.code === "HASH500");
+        if (hash500) return [hash500, ...value];
+      }
+    }
+    return value;
   } catch {
     return fallback;
   }
@@ -532,12 +547,103 @@ const defaultCoupons = [
     active: true,
   },
   {
+    id: "hash500",
+    code: "HASH500",
+    type: "fixed",
+    value: 500,
+    minimumOrder: 5000,
+    active: true,
+  },
+  {
     id: "tech5000",
     code: "TECH5000",
     type: "fixed",
     value: 5000,
     minimumOrder: 100000,
     active: true,
+  },
+];
+
+const defaultReviews = [
+  {
+    id: "rev-1",
+    productId: "p1",
+    productName: "iPhone 15 Pro",
+    name: "Usman Tariq",
+    rating: 5,
+    status: "Published",
+    text: "Delivered in sealed original retail box. Battery life and camera are breathtaking. Verified PTA approved. Highly recommended!",
+    date: "2026-10-24T14:32:00.000Z",
+  },
+  {
+    id: "rev-2",
+    productId: "p1",
+    productName: "iPhone 15 Pro",
+    name: "Zainab Fatima",
+    rating: 5,
+    status: "Published",
+    text: "Received the Natural Titanium model within 2 days in Lahore. 100% original with valid serial. Superb customer support.",
+    date: "2026-10-18T10:15:00.000Z",
+  },
+  {
+    id: "rev-3",
+    productId: "p2",
+    productName: "AirPods Pro 2",
+    name: "Bilal Sheikh",
+    rating: 5,
+    status: "Published",
+    text: "Active noise cancellation is phenomenal, cuts out all city traffic. Spatial audio is crisp and immersive.",
+    date: "2026-10-28T16:45:00.000Z",
+  },
+  {
+    id: "rev-4",
+    productId: "p2",
+    productName: "AirPods Pro 2",
+    name: "Ayesha Noor",
+    rating: 5,
+    status: "Published",
+    text: "Original Apple product with working warranty on Apple coverage checker. Fast doorstep delivery via TCS.",
+    date: "2026-10-14T09:20:00.000Z",
+  },
+  {
+    id: "rev-5",
+    productId: "p3",
+    productName: "MacBook Air M2",
+    name: "Farhan Ali",
+    rating: 5,
+    status: "Published",
+    text: "Completely silent, super fast, and the battery easily lasts 15+ hours of heavy development work. Best laptop investment.",
+    date: "2026-10-22T12:00:00.000Z",
+  },
+  {
+    id: "rev-6",
+    productId: "p4",
+    productName: "Smart Watch Series 9",
+    name: "Dr. Sarah Khan",
+    rating: 5,
+    status: "Published",
+    text: "Heart rate tracking and ECG are spot-on accurate. Display is ultra-bright even under direct Pakistani sunlight.",
+    date: "2026-10-12T11:10:00.000Z",
+  },
+  {
+    id: "rev-7",
+    productId: "p5",
+    productName: "Noise Cancel Headphones",
+    name: "Hamza Rehman",
+    rating: 5,
+    status: "Published",
+    text: "Cushioning is exceptionally comfortable for long work sessions. Rich bass without overpowering highs.",
+    date: "2026-10-05T18:25:00.000Z",
+  },
+  {
+    id: "rev-8",
+    productId: "p7",
+    productName: "Gaming Controller",
+    name: "Ahmed Raza",
+    rating: 5,
+    status: "Published",
+    text: "Zero input latency on PC and PS5. Ergonomics and trigger resistance feel sturdy and premium.",
+    date: "2026-09-29T15:30:00.000Z",
   },
 ];
 const defaultSettings = {
@@ -577,7 +683,10 @@ export function StoreProvider({ children }) {
     "hash-store-settings",
     defaultSettings,
   );
-  const [reviews, setReviews] = usePersistentState("hash-reviews", []);
+  const [reviews, setReviews] = usePersistentState(
+    "hash-reviews",
+    defaultReviews,
+  );
   const [messages, setMessages] = usePersistentState("hash-messages", []);
   const [subscribers, setSubscribers] = usePersistentState(
     "hash-subscribers",
@@ -830,6 +939,11 @@ export function StoreProvider({ children }) {
       reviews: Number(input.reviews || 0),
       icon: input.icon || "accessory",
       image: input.image || "",
+      images: Array.isArray(input.images) && input.images.length
+        ? input.images
+        : input.image
+          ? [input.image]
+          : [],
       description: String(input.description || "").trim(),
       createdAt: input.createdAt || new Date().toISOString(),
     };
@@ -847,6 +961,7 @@ export function StoreProvider({ children }) {
               ...updates,
               price: Number(updates.price ?? product.price),
               stock: Math.max(0, Number(updates.stock ?? product.stock)),
+              images: updates.images ?? product.images,
             }
           : product,
       ),

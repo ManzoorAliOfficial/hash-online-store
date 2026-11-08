@@ -1,13 +1,12 @@
 import Reveal from "../components/Common/Reveal";
 import Hero from "../components/Home/Hero";
 import Categories from "../components/Home/Categories";
-import FeaturedProducts from "../components/Home/FeaturedProducts";
-import BestSellers from "../components/Home/BestSellers";
-import NewArrivals from "../components/Home/NewArrivals";
+import ProductShowcase from "../components/Home/ProductShowcase";
 import PromoBanner from "../components/Home/PromoBanner";
 import WhyHashStore from "../components/Home/WhyHashStore";
 import Testimonials from "../components/Home/Testimonials";
 import Newsletter from "../components/Home/Newsletter";
+
 export default function Home() {
   return (
     <main>
@@ -18,13 +17,7 @@ export default function Home() {
         <Categories />
       </Reveal>
       <Reveal>
-        <FeaturedProducts />
-      </Reveal>
-      <Reveal>
-        <BestSellers />
-      </Reveal>
-      <Reveal>
-        <NewArrivals />
+        <ProductShowcase />
       </Reveal>
       <Reveal>
         <PromoBanner />

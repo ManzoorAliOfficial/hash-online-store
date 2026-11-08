@@ -1005,29 +1005,59 @@ function AdminPageContent({ page = "Dashboard" }) {
       <Modal
         open={modal?.type === "order"}
         onClose={() => setModal(null)}
-        title={"Order " + (modal?.value?.id || "")}
+        title={"Order Details #" + (modal?.value?.id || "")}
       >
         {modal?.value && (
-          <>
-            <p>
-              <b>{modal.value.details?.name}</b> · {modal.value.details?.email}
-            </p>
-            <p>
-              {modal.value.details?.phone} · {modal.value.details?.address},{" "}
-              {modal.value.details?.city}
-            </p>
-            {(Array.isArray(modal.value.items) ? modal.value.items : []).map(
-              (item) => (
-                <p key={item.id}>
-                  {item.product?.name} × {item.qty}{" "}
-                  <b>{money(item.product?.price * item.qty)}</b>
-                </p>
-              ),
-            )}
-            <p>
-              Total: <b>{money(modal.value.total)}</b>
-            </p>
-          </>
+          <div className="space-y-4 text-xs text-[#34445f]">
+            <div className="rounded-xl border border-[#e4eaf3] bg-[#f8fafd] p-4">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-[#71809a]">
+                Customer Information
+              </span>
+              <p className="mt-1 font-bold text-[#17233b]">
+                {modal.value.details?.name || "Guest Customer"}
+              </p>
+              <p className="mt-0.5 text-[#52617a]">
+                {modal.value.details?.email} · {modal.value.details?.phone}
+              </p>
+              <p className="mt-1.5 border-t border-[#e2e8f0] pt-1.5 text-[#52617a]">
+                <b className="text-[#17233b]">Delivery:</b>{" "}
+                {modal.value.details?.address}, {modal.value.details?.city}
+                {modal.value.details?.postal
+                  ? ` (${modal.value.details.postal})`
+                  : ""}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#e4eaf3] p-4">
+              <span className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-[#71809a]">
+                Order Items
+              </span>
+              <div className="divide-y divide-[#edf0f5]">
+                {(Array.isArray(modal.value.items) ? modal.value.items : []).map(
+                  (item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between py-2 first:pt-0 last:pb-0"
+                    >
+                      <div>
+                        <b className="text-[#17233b]">{item.product?.name}</b>
+                        <small className="block text-[#8491a5]">
+                          Qty: {item.qty} × {money(item.product?.price)}
+                        </small>
+                      </div>
+                      <b className="text-[#17233b]">
+                        {money((item.product?.price || 0) * item.qty)}
+                      </b>
+                    </div>
+                  ),
+                )}
+              </div>
+              <div className="mt-3 flex justify-between border-t border-[#e2e8f0] pt-2 text-sm font-bold text-[#17233b]">
+                <span>Total Amount:</span>
+                <span className="text-[#2563eb]">{money(modal.value.total)}</span>
+              </div>
+            </div>
+          </div>
         )}
       </Modal>
       <Modal
