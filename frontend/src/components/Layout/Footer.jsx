@@ -9,6 +9,7 @@ import {
   Truck,
   Package,
   Zap,
+  ArrowUp,
 } from "lucide-react";
 import storeLogo from "../../assets/icons/hash-online-store-wordmark.svg";
 import { useStore } from "../../context/StoreContext";
@@ -151,32 +152,44 @@ export default function Footer() {
     },
   ];
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <footer
       id="footer"
-      className="mt-auto border-t border-[#e2e8f0] bg-[#f5f8fd] px-[max(calc((100vw-1120px)/2),5%)] pt-[43px] text-[#728097] max-[600px]:px-4"
+      className="mt-auto border-t border-[#e2e8f0] bg-[#f5f8fd] px-4 pt-10 pb-4 text-[#728097] sm:px-6 sm:pt-11 lg:px-[max(calc((100vw-1120px)/2),5%)]"
     >
-      <div className="grid grid-cols-[1.3fr_.8fr_.9fr_1.2fr] gap-[35px] pb-8 max-[800px]:grid-cols-2 max-[600px]:grid-cols-1">
-        <div>
+      {/* Main Grid:
+          - Mobile (< 640px): 2 columns. Brand spans 2 cols. Explore (col 1) & Customer care (col 2) sit side-by-side. Newsletter spans 2 cols.
+          - Tablet (640px - 1024px): 2x2 grid.
+          - Desktop (1024px+): 4 columns.
+      */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-9 pb-8 sm:gap-8 lg:grid-cols-[1.3fr_.8fr_.9fr_1.2fr] lg:gap-[35px]">
+        {/* Col 1: Brand Info */}
+        <div className="col-span-2 sm:col-span-1 lg:col-span-1">
           <Link
             className="inline-flex"
             to="/"
             aria-label="Hash Online Store home"
           >
             <img
-              className="h-9 w-auto"
+              className="h-8 sm:h-9 w-auto"
               src={storeLogo}
               alt="Hash Online Store"
             />
           </Link>
-          <p className="mt-4 text-[10px] leading-[1.7]">
+          <p className="mt-3 sm:mt-4 text-xs sm:text-[11px] leading-relaxed text-[#627187]">
             Quality Products. Fast Delivery.
             <br />
             Trusted Shopping.
           </p>
 
-          <div className="mt-6">
-            <b className="text-xs text-[#24324c]">Follow us</b>
+          <div className="mt-5 sm:mt-6">
+            <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
+              Follow us
+            </span>
 
             <ul
               className="mt-3 flex flex-wrap gap-2"
@@ -185,7 +198,7 @@ export default function Footer() {
               {socialLinks.map((item) => (
                 <li key={item.name}>
                   <a
-                    className="group relative inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-[#e3e8f0] bg-white text-[#52617a] transition duration-200 hover:-translate-y-0.5 hover:border-[#102449] hover:bg-[#102449] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                    className="group relative inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-[#e3e8f0] bg-white text-[#52617a] transition duration-200 hover:-translate-y-0.5 hover:border-[#102449] hover:bg-[#102449] hover:text-white active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
                     href={item.href}
                     aria-label={item.name}
                     target="_blank"
@@ -204,26 +217,26 @@ export default function Footer() {
             </ul>
 
             {(email || phone) && (
-              <ul className="mt-4 flex flex-col gap-2 text-[11px]">
+              <ul className="mt-4 flex flex-col gap-1.5 text-xs sm:text-[11px]">
                 {email && (
                   <li>
                     <a
-                      className="inline-flex items-center gap-2 text-[#52617a] transition hover:text-[#2563eb]"
+                      className="inline-flex items-center gap-2 py-1 text-[#52617a] transition hover:text-[#2563eb]"
                       href={"mailto:" + email}
                     >
                       <Mail size={14} className="shrink-0 text-[#8a96a8]" />
-                      {email}
+                      <span className="break-all">{email}</span>
                     </a>
                   </li>
                 )}
                 {phone && (
                   <li>
                     <a
-                      className="inline-flex items-center gap-2 text-[#52617a] transition hover:text-[#2563eb]"
+                      className="inline-flex items-center gap-2 py-1 text-[#52617a] transition hover:text-[#2563eb]"
                       href={"tel:" + phone}
                     >
                       <Phone size={14} className="shrink-0 text-[#8a96a8]" />
-                      {phone}
+                      <span>{phone}</span>
                     </a>
                   </li>
                 )}
@@ -231,44 +244,77 @@ export default function Footer() {
             )}
           </div>
         </div>
-        <div className="flex flex-col items-start gap-[11px] text-[11px]">
-          <b className="text-xs text-[#24324c]">Explore</b>
-          <Link className="transition hover:text-[#2563eb]" to="/products">
+
+        {/* Col 2: Explore */}
+        <div className="col-span-1 flex flex-col items-start gap-2.5 text-xs sm:text-[11px]">
+          <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
+            Explore
+          </span>
+          <Link
+            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
+            to="/products"
+          >
             All products
           </Link>
-          <a className="transition hover:text-[#2563eb]" href="/#categories">
+          <a
+            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
+            href="/#categories"
+          >
             Categories
           </a>
-          <Link className="transition hover:text-[#2563eb]" to="/about">
+          <Link
+            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
+            to="/about"
+          >
             About us
           </Link>
         </div>
-        <div className="flex flex-col items-start gap-[11px] text-[11px]">
-          <b className="text-xs text-[#24324c]">Customer care</b>
-          <Link className="transition hover:text-[#2563eb]" to="/orders">
+
+        {/* Col 3: Customer care */}
+        <div className="col-span-1 flex flex-col items-start gap-2.5 text-xs sm:text-[11px]">
+          <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
+            Customer care
+          </span>
+          <Link
+            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
+            to="/orders"
+          >
             Track an order
           </Link>
-          <Link className="transition hover:text-[#2563eb]" to="/contact">
+          <Link
+            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
+            to="/contact"
+          >
             Contact us
           </Link>
-          <Link className="transition hover:text-[#2563eb]" to="/login">
+          <Link
+            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
+            to="/login"
+          >
             My account
           </Link>
-          <Link className="transition hover:text-[#2563eb]" to="/terms">
+          <Link
+            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
+            to="/terms"
+          >
             Terms & Conditions
           </Link>
         </div>
-        <div>
-          <b className="text-xs text-[#24324c]">Stay in the loop</b>
-          <p className="mt-3 text-[10px] leading-[1.7]">
+
+        {/* Col 4: Newsletter */}
+        <div className="col-span-2 sm:col-span-1 lg:col-span-1">
+          <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
+            Stay in the loop
+          </span>
+          <p className="mt-2.5 text-xs sm:text-[11px] leading-relaxed text-[#627187]">
             New arrivals and good finds, occasionally.
           </p>
           <form
-            className="mt-3 flex w-full rounded-md border border-[#e3e8f0] bg-white p-1 focus-within:border-[#2563eb]"
+            className="mt-3 flex w-full items-center rounded-lg border border-[#e3e8f0] bg-white p-1 shadow-2xs transition focus-within:border-[#2563eb] focus-within:ring-2 focus-within:ring-[#2563eb]/10"
             onSubmit={submit}
           >
             <input
-              className="min-w-0 flex-1 border-0 bg-transparent px-2 py-[7px] text-[10px] text-[#17233b] outline-none placeholder:text-[#9aa6b8]"
+              className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-xs sm:text-[11px] text-[#17233b] outline-none placeholder:text-[#9aa6b8]"
               name="email"
               type="email"
               required
@@ -276,7 +322,7 @@ export default function Footer() {
               placeholder="Your email address"
             />
             <button
-              className="grid size-[31px] cursor-pointer place-items-center rounded bg-[#2563eb] text-white transition hover:bg-[#174fcc]"
+              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-md bg-[#2563eb] text-white transition hover:bg-[#174fcc] active:scale-95"
               aria-label="Subscribe"
             >
               <ArrowRight size={15} />
@@ -284,7 +330,7 @@ export default function Footer() {
           </form>
           {message && (
             <small
-              className="mt-2 block text-[10px] font-semibold text-[#16803b]"
+              className="mt-2 block text-xs font-semibold text-[#16803b]"
               role="status"
             >
               {message}
@@ -292,58 +338,81 @@ export default function Footer() {
           )}
         </div>
       </div>
+
       {/* Verified Trust & Payment Partners Bar */}
       <div className="border-t border-[#e9edf3] py-5">
-        <div className="flex flex-wrap items-center justify-between gap-y-3.5 gap-x-6 text-[11px]">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between text-xs sm:text-[11px]">
           {/* Payment Methods */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="font-bold text-[#17233b]">Payment Methods:</span>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+            <span className="font-semibold text-[#17233b] shrink-0">
+              Payment Methods:
+            </span>
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <Banknote size={14} className="text-[#16803b]" />
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Banknote size={14} className="text-[#16803b] shrink-0" />
                 <span>Cash on Delivery</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <VisaLogo className="h-3 w-auto" />
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <VisaLogo className="h-3 w-auto shrink-0" />
                 <span>Visa</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <MastercardLogo className="h-3.5 w-auto" />
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <MastercardLogo className="h-3.5 w-auto shrink-0" />
                 <span>Mastercard</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#dbeafe] bg-[#f0f7ff] px-2.5 py-1 text-[11px] font-semibold text-[#1d4ed8] shadow-2xs transition hover:border-[#bfdbfe]">
-                <ShieldCheck size={14} className="text-[#2563eb]" />
-                <span>256-Bit SSL Encrypted</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#dbeafe] bg-[#f0f7ff] px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1d4ed8] shadow-2xs transition hover:border-[#bfdbfe]">
+                <ShieldCheck size={14} className="text-[#2563eb] shrink-0" />
+                <span>256-Bit SSL Secured</span>
               </span>
             </div>
           </div>
 
           {/* Courier Partners */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="font-bold text-[#17233b]">Courier Partners:</span>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+            <span className="font-semibold text-[#17233b] shrink-0">
+              Courier Partners:
+            </span>
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <Truck size={14} className="text-[#dc2626]" />
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Truck size={14} className="text-[#dc2626] shrink-0" />
                 <span>TCS Express</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <Package size={14} className="text-[#d97706]" />
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Package size={14} className="text-[#d97706] shrink-0" />
                 <span>Trax Logistics</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <Zap size={14} className="text-[#ca8a04]" />
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
+                <Zap size={14} className="text-[#ca8a04] shrink-0" />
                 <span>Leopard Courier</span>
               </span>
             </div>
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap justify-between gap-3 border-t border-[#e9edf3] py-4 text-[9px] text-[#8a96a8]">
-        <span>© 2026 Hash Online Store</span>
-        <span>Thoughtfully picked. Delivered with care.</span>
-        <Link className="hover:text-[#2563eb]" to="/terms">
-          Terms & Conditions
-        </Link>
+
+      {/* Copyright Bar */}
+      <div className="flex flex-col items-center justify-between gap-3 border-t border-[#e9edf3] py-4 text-center sm:flex-row sm:text-left text-xs sm:text-[10px] text-[#8a96a8]">
+        <span>© 2026 Hash Online Store. All rights reserved.</span>
+        <span className="hidden md:inline">
+          Thoughtfully picked. Delivered with care.
+        </span>
+        <div className="flex items-center gap-4">
+          <Link className="transition hover:text-[#2563eb]" to="/terms">
+            Terms & Conditions
+          </Link>
+          <span className="text-[#cbd5e1]" aria-hidden="true">
+            •
+          </span>
+          <button
+            type="button"
+            onClick={scrollToTop}
+            className="inline-flex items-center gap-1.5 font-medium text-[#52617a] transition hover:text-[#2563eb] cursor-pointer"
+            aria-label="Back to top"
+          >
+            <span>Back to top</span>
+            <ArrowUp size={12} className="stroke-[2.5]" />
+          </button>
+        </div>
       </div>
     </footer>
   );
