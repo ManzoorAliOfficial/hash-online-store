@@ -1,1 +1,0 @@
-import{S as e}from"./index-CddScHre.js";var t={name:`circle-check-big`,size:24,node:[[`path`,{d:`M21.801 10A10 10 0 1 1 17 3.335`,key:`yps3ct`}],[`path`,{d:`m9 11 3 3L22 4`,key:`1pflzl`}]],aliases:[`check-circle`]};t.node;var n=e(t),r={name:`minus`,size:24,node:[[`path`,{d:`M5 12h14`,key:`1ays0h`}]]};r.node;var i=e(r);export{n,i as t};
