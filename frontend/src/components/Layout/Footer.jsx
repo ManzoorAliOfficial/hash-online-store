@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import storeLogo from "../../assets/icons/hash-online-store-wordmark.svg";
 import { useStore } from "../../context/StoreContext";
+import { normalizePkNumber, DEFAULT_WHATSAPP_NUMBER } from "../../utils/whatsapp";
 
 function VisaLogo({ className = "h-3 w-auto" }) {
   return (
@@ -121,18 +122,18 @@ export default function Footer() {
   };
   const phone = String(settings.supportPhone || "").trim();
   const email = String(settings.supportEmail || "").trim();
-  const whatsappNumber = String(settings.whatsappNumber || "").replace(
-    /\D/g,
-    "",
+  const whatsappDigits = normalizePkNumber(
+    settings.whatsappNumber || DEFAULT_WHATSAPP_NUMBER
   );
+  const whatsappUrl = whatsappDigits
+    ? `https://wa.me/${whatsappDigits}`
+    : "https://wa.me/923013858980";
 
   // Social platforms only. Email and phone are shown as contact lines below.
   const socialLinks = [
     {
       name: "WhatsApp",
-      href: whatsappNumber
-        ? "https://wa.me/" + whatsappNumber
-        : "https://www.whatsapp.com/",
+      href: whatsappUrl,
       icon: "whatsapp",
     },
     {

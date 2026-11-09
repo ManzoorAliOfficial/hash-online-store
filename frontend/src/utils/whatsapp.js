@@ -3,6 +3,8 @@
  * Handles phone normalization, structured message generation, and deep-linking.
  */
 
+export const DEFAULT_WHATSAPP_NUMBER = "+92 301 3858980";
+
 /**
  * Normalizes a Pakistani phone number into digits-only format: 92XXXXXXXXXX
  * Converts:
@@ -144,10 +146,18 @@ export function buildCartMessage(items = [], totals = {}) {
 
 /**
  * Opens WhatsApp in a new browser tab with the prefilled message.
- * Reads number from settings.whatsappNumber; if missing, triggers "hash-toast" event.
+ * Reads number from settings.whatsappNumber; falls back to DEFAULT_WHATSAPP_NUMBER (+92 301 3858980).
  */
 export function openWhatsApp(message, rawNumber) {
-  const number = normalizePkNumber(rawNumber);
+  // Use provided number, or fall back to default live number if missing or previous demo placeholder
+  const candidate =
+    !rawNumber ||
+    rawNumber === "+92 300 1234567" ||
+    rawNumber.replace(/\D/g, "") === "923001234567"
+      ? DEFAULT_WHATSAPP_NUMBER
+      : rawNumber;
+
+  const number = normalizePkNumber(candidate);
 
   if (!number) {
     if (typeof window !== "undefined") {

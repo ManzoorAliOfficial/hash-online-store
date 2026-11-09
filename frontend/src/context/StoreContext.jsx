@@ -649,8 +649,8 @@ const defaultReviews = [
 const defaultSettings = {
   storeName: "Hash Online Store",
   supportEmail: "support@hashstore.pk",
-  supportPhone: "+92 300 1234567",
-  whatsappNumber: "+92 300 1234567",
+  supportPhone: "+92 301 3858980",
+  whatsappNumber: "+92 301 3858980",
   instagramUrl: "",
   twitterUrl: "",
   linkedinUrl: "",
@@ -701,6 +701,23 @@ export function StoreProvider({ children }) {
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const openCartDrawer = () => setCartDrawerOpen(true);
   const closeCartDrawer = () => setCartDrawerOpen(false);
+
+  useEffect(() => {
+    // Automatically migrate placeholder phone numbers to the live WhatsApp number
+    if (
+      settings?.whatsappNumber === "+92 300 1234567" ||
+      !settings?.whatsappNumber
+    ) {
+      setSettings((prev) => ({
+        ...prev,
+        whatsappNumber: "+92 301 3858980",
+        supportPhone:
+          prev?.supportPhone === "+92 300 1234567" || !prev?.supportPhone
+            ? "+92 301 3858980"
+            : prev.supportPhone,
+      }));
+    }
+  }, [settings?.whatsappNumber, settings?.supportPhone, setSettings]);
 
   useEffect(() => {
     setCart((previous) => {
