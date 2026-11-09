@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 
 const seed = [
   {
@@ -699,8 +699,8 @@ export function StoreProvider({ children }) {
     { id: "tcs", name: "TCS", enabled: false },
   ]);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
-  const openCartDrawer = () => setCartDrawerOpen(true);
-  const closeCartDrawer = () => setCartDrawerOpen(false);
+  const openCartDrawer = useCallback(() => setCartDrawerOpen(true), []);
+  const closeCartDrawer = useCallback(() => setCartDrawerOpen(false), []);
 
   useEffect(() => {
     // Automatically migrate placeholder phone numbers to the live WhatsApp number
@@ -1337,6 +1337,9 @@ export function StoreProvider({ children }) {
       cart,
       cartCount,
       cartTotals,
+      cartDrawerOpen,
+      openCartDrawer,
+      closeCartDrawer,
       wishlist,
       orders,
       user,

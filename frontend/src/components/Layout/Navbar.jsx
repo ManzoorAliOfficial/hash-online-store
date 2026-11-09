@@ -14,8 +14,7 @@ const mobileClass = ({ isActive }) =>
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { cart, wishlist, user, openCartDrawer } = useStore();
-  const cartCount = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+  const { cartCount, wishlist, user, openCartDrawer } = useStore();
   const close = () => setOpen(false);
 
   useEffect(() => {
@@ -55,13 +54,13 @@ export default function Navbar() {
           <NavLink to="/products" className={navClass}>
             Products
           </NavLink>
-          <a
-            className="text-base font-semibold text-[#43536c] transition hover:text-[#2563eb]"
-            href="/#categories"
+          <NavLink
+            className={navClass}
+            to="/products"
             onClick={close}
           >
             Categories
-          </a>
+          </NavLink>
           <NavLink to="/about" className={navClass}>
             About
           </NavLink>
@@ -148,13 +147,9 @@ export default function Navbar() {
             <NavLink to="/products" className={mobileClass} onClick={close}>
               Products
             </NavLink>
-            <a
-              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-[#334560] transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
-              href="/#categories"
-              onClick={close}
-            >
+            <NavLink to="/products" className={mobileClass} onClick={close}>
               Categories
-            </a>
+            </NavLink>
             <NavLink to="/about" className={mobileClass} onClick={close}>
               About
             </NavLink>

@@ -1,6 +1,5 @@
 import Reveal from "../components/Common/Reveal";
 import Hero from "../components/Home/Hero";
-import Categories from "../components/Home/Categories";
 import ProductShowcase from "../components/Home/ProductShowcase";
 import PromoBanner from "../components/Home/PromoBanner";
 import WhyHashStore from "../components/Home/WhyHashStore";
@@ -12,9 +11,6 @@ export default function Home() {
     <main>
       <Reveal className="block">
         <Hero />
-      </Reveal>
-      <Reveal>
-        <Categories />
       </Reveal>
       <Reveal>
         <ProductShowcase />

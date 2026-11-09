@@ -2,7 +2,6 @@ import { Outlet } from "react-router";
 import Navbar from "../components/Layout/Navbar";
 import Footer from "../components/Layout/Footer";
 import Toast from "../components/Common/Toast";
-import BackToTop from "../components/Common/BackToTop";
 import CartDrawer from "../components/Cart/CartDrawer";
 import BottomNav from "../components/Layout/BottomNav";
 import FloatingWhatsApp from "../components/Common/FloatingWhatsApp";
@@ -19,7 +18,6 @@ export default function StoreLayout() {
       <CartDrawer />
       <FloatingWhatsApp />
       <Toast />
-      <BackToTop />
     </div>
   );
 }

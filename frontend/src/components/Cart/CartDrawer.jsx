@@ -90,7 +90,7 @@ export default function CartDrawer() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-xs transition-opacity duration-300"
+      className="fixed inset-0 z-[60] flex justify-end bg-black/50 backdrop-blur-xs transition-opacity duration-300"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeCartDrawer();
       }}
