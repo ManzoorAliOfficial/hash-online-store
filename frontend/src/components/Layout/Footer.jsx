@@ -4,9 +4,6 @@ import {
   ArrowRight,
   Mail,
   Phone,
-  Truck,
-  Package,
-  Zap,
   ArrowUp,
 } from "lucide-react";
 import storeLogo from "../../assets/icons/hash-online-store-wordmark.svg";
@@ -295,32 +292,6 @@ export default function Footer() {
               {message}
             </small>
           )}
-        </div>
-      </div>
-
-      {/* Courier Partners Bar */}
-      <div className="border-t border-[#e9edf3] py-5">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between text-xs sm:text-[11px]">
-          {/* Courier Partners */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
-            <span className="font-semibold text-[#17233b] shrink-0">
-              Courier Partners:
-            </span>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <Truck size={14} className="text-[#dc2626] shrink-0" />
-                <span>TCS Express</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <Package size={14} className="text-[#d97706] shrink-0" />
-                <span>Trax Logistics</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2e8f0] bg-white px-2.5 py-1 text-xs sm:text-[11px] font-medium text-[#1e293b] shadow-2xs transition hover:border-[#cbd5e1]">
-                <Zap size={14} className="text-[#ca8a04] shrink-0" />
-                <span>Leopard Courier</span>
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 
