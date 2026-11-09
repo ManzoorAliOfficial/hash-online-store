@@ -14,7 +14,7 @@ const mobileClass = ({ isActive }) =>
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { cart, wishlist, user } = useStore();
+  const { cart, wishlist, user, openCartDrawer } = useStore();
   const cartCount = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
   const close = () => setOpen(false);
 
@@ -109,22 +109,23 @@ export default function Navbar() {
               strokeWidth={2}
             />
           </Link>
-          <Link
+          <button
+            type="button"
+            onClick={openCartDrawer}
             aria-label="Cart"
             title="Cart"
-            className="relative grid size-10 place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
-            to="/cart"
+            className="relative grid size-10 cursor-pointer place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
           >
             <ShoppingBag
               className="size-5 max-[900px]:size-[18px]"
               strokeWidth={2}
             />
             {cartCount > 0 && (
-              <i className="absolute right-1 top-1 grid size-[18px] place-items-center rounded-full bg-[#2563eb] text-[10px] font-bold not-italic text-white">
-                {cartCount}
+              <i className="absolute right-1 top-1 grid size-[18px] place-items-center rounded-full bg-[#f97316] text-[10px] font-black not-italic text-white shadow-xs">
+                {cartCount > 99 ? "99+" : cartCount}
               </i>
             )}
-          </Link>
+          </button>
           <button
             className="grid size-10 place-items-center rounded-lg text-[#203653] hover:bg-[#f4f7fc] lg:hidden"
             type="button"
@@ -170,9 +171,21 @@ export default function Navbar() {
             <NavLink to="/wishlist" className={mobileClass} onClick={close}>
               Wishlist{wishlist.length > 0 && ` (${wishlist.length})`}
             </NavLink>
-            <NavLink to="/cart" className={mobileClass} onClick={close}>
-              Cart{cartCount > 0 && ` (${cartCount})`}
-            </NavLink>
+            <button
+              type="button"
+              onClick={() => {
+                close();
+                openCartDrawer();
+              }}
+              className="flex items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[#334560] transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
+            >
+              <span>Cart</span>
+              {cartCount > 0 && (
+                <span className="rounded-full bg-[#f97316] px-2 py-0.5 text-xs font-bold text-white">
+                  {cartCount}
+                </span>
+              )}
+            </button>
           </nav>
         )}
       </header>

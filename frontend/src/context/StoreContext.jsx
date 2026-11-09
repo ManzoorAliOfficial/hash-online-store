@@ -649,14 +649,14 @@ const defaultReviews = [
 const defaultSettings = {
   storeName: "Hash Online Store",
   supportEmail: "support@hashstore.pk",
-  supportPhone: "",
-  whatsappNumber: "",
+  supportPhone: "+92 300 1234567",
+  whatsappNumber: "+92 300 1234567",
   instagramUrl: "",
   twitterUrl: "",
   linkedinUrl: "",
   currency: "PKR",
   deliveryFee: 1500,
-  freeDeliveryThreshold: 0,
+  freeDeliveryThreshold: 5000,
 };
 
 export function StoreProvider({ children }) {
@@ -698,6 +698,9 @@ export function StoreProvider({ children }) {
     { id: "mnp", name: "M&P", enabled: false },
     { id: "tcs", name: "TCS", enabled: false },
   ]);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const openCartDrawer = () => setCartDrawerOpen(true);
+  const closeCartDrawer = () => setCartDrawerOpen(false);
 
   useEffect(() => {
     setCart((previous) => {
@@ -739,10 +742,12 @@ export function StoreProvider({ children }) {
           : activeCoupon.value,
       )
     : 0;
+  const freeThreshold =
+    Number(settings.freeDeliveryThreshold) > 0
+      ? Number(settings.freeDeliveryThreshold)
+      : 5000;
   const delivery =
-    subtotal === 0 ||
-    (settings.freeDeliveryThreshold > 0 &&
-      subtotal >= settings.freeDeliveryThreshold)
+    subtotal === 0 || subtotal >= freeThreshold
       ? 0
       : Number(settings.deliveryFee || 0);
   const cartTotals = useMemo(
@@ -757,7 +762,7 @@ export function StoreProvider({ children }) {
   );
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
-  const addToCart = (id, quantity = 1) => {
+  const addToCart = (id, quantity = 1, openDrawer = true) => {
     quantity = Math.max(1, Math.floor(Number(quantity) || 1));
     const product = products.find((entry) => entry.id === id);
     const currentQuantity =
@@ -783,6 +788,7 @@ export function StoreProvider({ children }) {
         : [...previous, { id, qty: quantity }];
     });
     emitNotice("Added to your cart.");
+    if (openDrawer) setCartDrawerOpen(true);
     return true;
   };
 
@@ -1263,6 +1269,10 @@ export function StoreProvider({ children }) {
       cart,
       cartCount,
       cartTotals,
+      cartDrawerOpen,
+      setCartDrawerOpen,
+      openCartDrawer,
+      closeCartDrawer,
       addToCart,
       setQty,
       removeFromCart,

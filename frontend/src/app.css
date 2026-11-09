@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand: #2563eb;
+  --color-brand-hover: #1d4ed8;
+  --color-brand-light: #eff4ff;
+  --color-brand-dark: #102449;
+
+  --color-accent: #f97316;
+  --color-accent-hover: #ea580c;
+  --color-accent-light: #fff7ed;
+  --color-accent-dark: #c2410c;
+
+  --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  --shadow-card-hover: 0 14px 30px -4px rgba(16, 36, 73, 0.12);
+}
+
+:root {
+  --brand: #2563eb;
+  --brand-hover: #1d4ed8;
+  --brand-light: #eff4ff;
+  --brand-dark: #102449;
+  --accent: #f97316;
+  --accent-hover: #ea580c;
+  --accent-light: #fff7ed;
+}
+
 @layer base {
   :root {
     color: #17233b;

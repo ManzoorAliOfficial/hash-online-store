@@ -1,1 +1,0 @@
-import{t as e}from"./AdminPage-B38jtaNd.js";import{t}from"./jsx-runtime-DyZJNswf.js";var n=t();function r(){return(0,n.jsx)(e,{page:`Messages`})}export{r as default};

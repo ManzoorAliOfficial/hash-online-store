@@ -26,11 +26,11 @@ export default function BackToTop() {
     <button
       type="button"
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-40 grid size-11 cursor-pointer place-items-center rounded-full bg-[#2563eb] text-white shadow-[0_6px_20px_rgba(37,99,235,0.35)] transition-all duration-200 hover:bg-[#174fcc] hover:scale-110 active:scale-95 max-[600px]:bottom-4 max-[600px]:right-4 max-[600px]:size-10"
+      className="fixed bottom-36 right-4.5 z-30 grid size-10.5 cursor-pointer place-items-center rounded-full bg-[#102449] text-white shadow-lg transition-all duration-200 hover:bg-[#2563eb] hover:scale-110 active:scale-95 md:bottom-23 md:right-7.5 md:size-11"
       aria-label="Back to top of page"
       title="Back to top"
     >
-      <ArrowUp size={20} />
+      <ArrowUp size={18} />
     </button>
   );
 }

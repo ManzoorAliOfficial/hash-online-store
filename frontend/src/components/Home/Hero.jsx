@@ -127,23 +127,24 @@ export default function Hero() {
             From {slide.startingPrice}
           </span>
         </div>
-        <h1 className="my-4 text-[clamp(44px,5vw,66px)] leading-[1.02] tracking-[-.06em] max-[600px]:text-[43px]">
+        <h1 className="my-3 text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-[54px] leading-[1.08] text-[#071a3d]">
           {slide.title}
           <br />
           <em className="not-italic text-[#2563eb]">{slide.highlight}</em>
         </h1>
-        <p className="max-w-[410px] text-sm leading-7 text-[#71809a] max-[600px]:text-[13px]">
+        <p className="max-w-[410px] text-xs sm:text-sm leading-relaxed text-[#71809a]">
           {slide.description}
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-5 sm:mt-6 flex flex-wrap gap-2.5 sm:gap-3">
           <Link
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#2563eb] px-[17px] py-[13px] text-xs font-bold text-white transition hover:-translate-y-px hover:bg-[#174a93] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff]"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-5 py-3 text-xs font-bold text-white shadow-md transition hover:bg-[#1d4ed8] active:scale-95"
             to="/products"
           >
-            Shop products <ArrowRight size={16} />
+            <span>Shop products</span>
+            <ArrowRight size={15} />
           </Link>
           <a
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#e1e7f0] bg-white px-[17px] py-[13px] text-xs font-bold text-[#20304b] transition hover:-translate-y-px hover:border-[#aac4f3] hover:bg-[#f2f6ff] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[#94b8ff]"
+            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#e1e7f0] bg-white px-5 py-3 text-xs font-bold text-[#20304b] transition hover:border-[#aac4f3] hover:bg-[#f2f6ff] active:scale-95"
             href="#categories"
           >
             Explore categories

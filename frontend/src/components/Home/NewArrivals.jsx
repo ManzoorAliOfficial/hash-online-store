@@ -9,7 +9,7 @@ export default function NewArrivals() {
     .slice(0, 30);
   return (
     <section className="mx-auto mb-[76px] max-w-[1120px] max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-[52px]">
-      <div className="mb-6 flex items-end justify-between max-[600px]:items-start max-[600px]:gap-2.5">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <span className="text-[10px] font-extrabold tracking-[.14em] text-[#2563eb]">
             JUST LANDED

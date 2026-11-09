@@ -7,7 +7,7 @@ export default function FeaturedProducts() {
   const featured = products.slice(0, 30);
   return (
     <section className="mb-[76px] bg-[#f8fafd] px-[max(calc((100vw-1120px)/2),5%)] py-11 max-[900px]:px-[5%] max-[600px]:mb-[52px] max-[600px]:px-4 max-[600px]:py-[35px]">
-      <div className="mx-auto mb-6 flex max-w-[1120px] items-end justify-between max-[600px]:items-start max-[600px]:gap-2.5">
+      <div className="mx-auto mb-6 flex flex-wrap max-w-[1120px] items-end justify-between gap-3">
         <div>
           <span className="text-[10px] font-extrabold tracking-[.14em] text-[#2563eb]">
             HAND-PICKED FOR YOU

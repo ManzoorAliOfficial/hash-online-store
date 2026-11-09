@@ -132,7 +132,7 @@ export default function Categories() {
       className="mx-auto mb-[76px] max-w-[1200px] max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-[52px]"
       aria-label="Product categories"
     >
-      <div className="mb-6 flex items-end justify-between max-[600px]:items-start max-[600px]:gap-2.5">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="inline-flex items-center gap-1.5 text-[10px] font-extrabold tracking-[.14em] text-[#2563eb]">
             <Sparkles size={13} className="text-[#2563eb]" />

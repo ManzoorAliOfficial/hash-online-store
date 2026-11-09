@@ -1,0 +1,1 @@
+import{t as e}from"./AdminPage-D_kNjxVp.js";import{t}from"./jsx-runtime-DyZJNswf.js";var n=t();function r(){return(0,n.jsx)(e,{page:`Products`})}export{r as default};

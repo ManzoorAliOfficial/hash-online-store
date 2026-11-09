@@ -11,6 +11,8 @@ import {
   Check,
 } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
+import WhatsAppIcon from "../Common/WhatsAppIcon";
+import { buildProductMessage, openWhatsApp } from "../../utils/whatsapp";
 
 const money = (value) => `Rs. ${Number(value || 0).toLocaleString()}`;
 
@@ -27,7 +29,7 @@ const defaultStorage = [
 ];
 
 export default function ProductInfo({ product }) {
-  const { addToCart } = useStore();
+  const { addToCart, settings } = useStore();
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
   const [selectedColor, setSelectedColor] = useState(defaultColors[0].name);
@@ -57,6 +59,16 @@ export default function ProductInfo({ product }) {
     if (addToCart(product.id, qty)) {
       navigate("/checkout");
     }
+  };
+
+  const handleWhatsAppOrder = () => {
+    if (!inStock) return;
+    const msg = buildProductMessage(product, qty, {
+      price: effectivePrice,
+      color: selectedColor,
+      storage: isTechItem ? selectedStorage.label : null,
+    });
+    openWhatsApp(msg, settings?.whatsappNumber);
   };
 
   return (
@@ -198,19 +210,38 @@ export default function ProductInfo({ product }) {
       <div className="grid gap-2.5 sm:grid-cols-2">
         <button
           type="button"
-          className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#eff4ff] px-5 text-xs font-bold text-[#2563eb] transition hover:bg-[#dce9ff] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-[46px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#f97316] px-5 text-sm font-bold text-white shadow-md transition hover:bg-[#ea580c] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!inStock}
           onClick={handleAddToCart}
         >
-          <ShoppingBag size={16} /> Add to Cart
+          <ShoppingBag size={17} /> Add to Cart
         </button>
         <button
           type="button"
-          className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-lg bg-[#2563eb] px-5 text-xs font-bold text-white transition hover:bg-[#174fcc] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-[46px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-5 text-sm font-bold text-white shadow-xs transition hover:bg-[#1d4ed8] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!inStock}
           onClick={handleBuyNow}
         >
-          Shop Now <ArrowRight size={16} />
+          Buy Now <ArrowRight size={17} />
+        </button>
+      </div>
+
+      {/* WhatsApp Quick Order CTA */}
+      <div className="mt-2.5">
+        <button
+          type="button"
+          disabled={!inStock}
+          onClick={handleWhatsAppOrder}
+          title={
+            inStock
+              ? "Order directly on WhatsApp"
+              : "This product is currently out of stock"
+          }
+          aria-label="Order on WhatsApp"
+          className="inline-flex min-h-[46px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[#25D366] px-5 text-sm font-bold text-white shadow-md transition duration-200 hover:bg-[#20ba59] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2"
+        >
+          <WhatsAppIcon className="size-5" />
+          <span>Order on WhatsApp</span>
         </button>
       </div>
     </section>
