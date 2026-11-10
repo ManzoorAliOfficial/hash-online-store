@@ -5,6 +5,8 @@ import Toast from "../components/Common/Toast";
 
 export default function AdminLayout() {
   const { user, loginAsDemoAdmin, logout } = useStore();
+  const isAdminDemoEnabled = import.meta.env.VITE_ENABLE_ADMIN_DEMO === "true";
+
   if (user?.role !== "admin")
     return (
       <main className="grid min-h-screen place-items-center bg-[#f4f7fc] p-5">
@@ -15,17 +17,25 @@ export default function AdminLayout() {
           <h1 className="text-3xl font-bold tracking-[-.05em] text-[#071a3d]">
             Admin dashboard
           </h1>
-          <p className="text-sm leading-6 text-[#71809a]">
-            This preview uses browser-local data and is not protected by
-            server-side authentication.
-          </p>
-          <button
-            className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#2563eb] px-5 text-xs font-bold text-white transition hover:bg-[#174fcc]"
-            type="button"
-            onClick={() => loginAsDemoAdmin()}
-          >
-            Continue to admin preview
-          </button>
+          {isAdminDemoEnabled ? (
+            <>
+              <p className="text-sm leading-6 text-[#71809a]">
+                This preview uses browser-local data and is not protected by
+                server-side authentication.
+              </p>
+              <button
+                className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#2563eb] px-5 text-xs font-bold text-white transition hover:bg-[#174fcc]"
+                type="button"
+                onClick={() => loginAsDemoAdmin()}
+              >
+                Continue to admin preview
+              </button>
+            </>
+          ) : (
+            <p className="text-sm leading-6 text-[#71809a]">
+              Admin is not available
+            </p>
+          )}
           <Link
             className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[#dce5f3] bg-white px-5 text-xs font-bold text-[#34445f] hover:bg-[#f4f7fc]"
             to="/"

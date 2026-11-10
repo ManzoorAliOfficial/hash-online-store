@@ -16,7 +16,18 @@ export default function Orders() {
             o.details?.email?.toLowerCase() === user.email.toLowerCase()),
       );
     }
-    return orders.filter((o) => !o.userId);
+    let guestEmail = null;
+    try {
+      guestEmail = sessionStorage.getItem("hash-guest-email");
+    } catch {
+      // ignore
+    }
+    if (!guestEmail) return [];
+    return orders.filter(
+      (o) =>
+        !o.userId &&
+        o.details?.email?.toLowerCase() === guestEmail.toLowerCase(),
+    );
   }, [orders, user]);
 
   return (

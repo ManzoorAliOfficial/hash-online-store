@@ -305,18 +305,6 @@ export default function Footer() {
           <Link className="transition hover:text-[#2563eb]" to="/terms">
             Terms & Conditions
           </Link>
-          <span className="text-[#cbd5e1]" aria-hidden="true">
-            •
-          </span>
-          <button
-            type="button"
-            onClick={scrollToTop}
-            className="inline-flex items-center gap-1.5 font-medium text-[#52617a] transition hover:text-[#2563eb] cursor-pointer"
-            aria-label="Back to top"
-          >
-            <span>Back to top</span>
-            <ArrowUp size={12} className="stroke-[2.5]" />
-          </button>
         </div>
       </div>
     </footer>

@@ -48,18 +48,18 @@ const seed = [
   },
   {
     id: "p4",
-    name: "Smart Watch Series 9",
+    name: "Watch S11 Series",
     category: "Wearables",
     price: 89999,
-    oldPrice: 99999,
-    rating: 4.7,
-    reviews: 53,
-    stock: 13,
+    oldPrice: 119999,
+    rating: 4.8,
+    reviews: 64,
+    stock: 15,
     icon: "watch",
     image:
-      "https://images.unsplash.com/photo-1624096104992-9b4fa3a279dd?auto=format&fit=crop&w=900&h=700&q=85",
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&h=700&q=85",
     description:
-      "Track activity, stay connected and keep useful health insights close at hand.",
+      "Next-generation flagship smartwatch with edge-to-edge OLED display, fast wireless charging, and comprehensive fitness tracking.",
   },
   {
     id: "p5",
@@ -618,7 +618,7 @@ const defaultReviews = [
   {
     id: "rev-6",
     productId: "p4",
-    productName: "Smart Watch Series 9",
+    productName: "Watch S11 Series",
     name: "Dr. Sarah Khan",
     rating: 5,
     status: "Published",
