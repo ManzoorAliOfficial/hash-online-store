@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { ArrowRight, Tag, Copy, Check, Sparkles, Star } from "lucide-react";
 import { Link } from "react-router";
+import { PRIMARY_OFFER } from "../../constants/offers";
 
 export default function PromoBanner() {
   const [copied, setCopied] = useState(false);
-  const couponCode = "WELCOME10";
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(couponCode);
+      await navigator.clipboard.writeText(PRIMARY_OFFER.code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -28,7 +28,7 @@ export default function PromoBanner() {
 
       {/* Left copy & CTA content */}
       <div className="relative z-10 max-w-[540px]">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-[10px] font-extrabold tracking-[.14em] text-[#a9c6ff] backdrop-blur-md">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-xs font-extrabold tracking-[.14em] text-[#a9c6ff] backdrop-blur-md">
           <Sparkles size={13} className="text-[#60a5fa]" />
           <span>SPECIAL PROMOTIONAL OFFER</span>
         </div>
@@ -38,21 +38,24 @@ export default function PromoBanner() {
         </h2>
 
         <p className="text-xs leading-relaxed text-[#d1ddf4] sm:text-sm">
-          Discover handpicked audio, wearables and creator essentials with verified brand warranty and express nationwide delivery.
+          Discover handpicked audio, wearables and creator essentials with
+          verified brand warranty and express nationwide delivery.
         </p>
 
         {/* Real Coupon Callout with 1-Click Copy */}
         <div className="my-5 flex flex-wrap items-center gap-3">
           <div className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">
             <Tag size={14} className="text-[#a9c6ff]" />
-            <span className="text-xs font-medium text-[#d1ddf4]">Use code:</span>
+            <span className="text-xs font-medium text-[#d1ddf4]">
+              Use code:
+            </span>
             <code className="font-mono text-xs font-extrabold tracking-wider text-white">
-              {couponCode}
+              {PRIMARY_OFFER.code}
             </code>
             <button
               type="button"
               onClick={handleCopy}
-              className="ml-1 inline-flex cursor-pointer items-center gap-1 rounded-lg bg-white/20 px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-white hover:text-[#0c2352] active:scale-95"
+              className="ml-1 inline-flex cursor-pointer items-center gap-1 rounded-lg bg-white/20 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-white hover:text-[#0c2352] active:scale-95"
               aria-label="Copy coupon code"
             >
               {copied ? (
@@ -70,7 +73,7 @@ export default function PromoBanner() {
           </div>
 
           <span className="text-xs font-semibold text-[#a9c6ff]">
-            10% OFF orders over Rs. 25,000
+            {PRIMARY_OFFER.fullOfferText}
           </span>
         </div>
 
@@ -83,7 +86,7 @@ export default function PromoBanner() {
         </Link>
       </div>
 
-      {/* Right side: Modern High-Res Product Cutout Showcase (replacing placeholder vector icons) */}
+      {/* Right side: Modern High-Res Product Cutout Showcase */}
       <div className="relative hidden w-[42%] items-center justify-center lg:flex">
         {/* Soft radial aura */}
         <div className="pointer-events-none absolute size-56 rounded-full bg-blue-400/25 blur-3xl" />
@@ -93,9 +96,13 @@ export default function PromoBanner() {
           <img
             src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&h=600&q=85"
             alt="Noise Canceling Headphones"
+            width="192"
+            height="192"
+            loading="lazy"
+            decoding="async"
             className="size-48 rounded-2xl object-cover shadow-[0_25px_40px_rgba(0,0,0,0.38)] ring-1 ring-white/20"
           />
-          <div className="absolute -bottom-3 -right-3 flex items-center gap-1.5 rounded-xl border border-white/40 bg-white/95 px-3 py-1.5 text-[11px] font-bold text-[#17233b] shadow-md backdrop-blur-md">
+          <div className="absolute -bottom-3 -right-3 flex items-center gap-1.5 rounded-xl border border-white/40 bg-white/95 px-3 py-1.5 text-xs font-bold text-[#17233b] shadow-md backdrop-blur-md">
             <Star size={13} className="text-[#f5a623] fill-[#f5a623]" />
             <span>4.9 · Premium Sound</span>
           </div>
@@ -106,6 +113,10 @@ export default function PromoBanner() {
           <img
             src="https://images.unsplash.com/photo-1733556046403-2d090cf359a3?auto=format&fit=crop&w=400&h=400&q=85"
             alt="AirPods Pro 2"
+            width="112"
+            height="112"
+            loading="lazy"
+            decoding="async"
             className="size-28 rounded-2xl object-cover shadow-[0_20px_30px_rgba(0,0,0,0.38)] ring-1 ring-white/20"
           />
         </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, Mail, Gift, CheckCircle2 } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
+import { PRIMARY_OFFER } from "../../constants/offers";
 
 export default function Newsletter() {
   const { subscribe } = useStore();
@@ -11,7 +12,7 @@ export default function Newsletter() {
     event.preventDefault();
     const email = new FormData(event.currentTarget).get("email");
     if (subscribe(email)) {
-      setMessage("Welcome aboard! Use voucher code HASH500 on your first order.");
+      setMessage(PRIMARY_OFFER.successMessage);
       setSuccess(true);
       event.currentTarget.reset();
     } else {
@@ -27,15 +28,17 @@ export default function Newsletter() {
     >
       <div className="grid grid-cols-[1.2fr_1fr] items-center gap-8 max-[850px]:grid-cols-1 max-[850px]:gap-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-extrabold tracking-[.14em] text-[#a9c6ff]">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-extrabold tracking-[.14em] text-[#a9c6ff]">
             <Gift size={13} className="text-[#60a5fa]" />
             <span>WELCOME REWARD</span>
           </div>
-          <h3 className="mt-3 text-2xl font-extrabold tracking-[-.04em] text-white sm:text-3xl max-[600px]:text-xl">
-            Get Rs. 500 OFF your first order.
-          </h3>
+          {/* Changed h3 to h2 */}
+          <h2 className="mt-3 text-2xl font-extrabold tracking-[-.04em] text-white sm:text-3xl max-[600px]:text-xl">
+            {PRIMARY_OFFER.headline}
+          </h2>
           <p className="mt-2 text-xs leading-relaxed text-[#c6d5ee] sm:text-sm">
-            Subscribe to our newsletter for exclusive weekly product drops, secret flash sales, and tech guides.
+            Subscribe to our newsletter for exclusive weekly product drops,
+            secret flash sales, and verified tech guides across Pakistan.
           </p>
         </div>
 

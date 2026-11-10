@@ -31,7 +31,7 @@ export default function WhyHashStore() {
     >
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-[10px] font-extrabold tracking-[.14em] text-[#2563eb]">
+          <div className="inline-flex items-center gap-1.5 text-xs font-extrabold tracking-[.14em] text-[#2563eb]">
             <Sparkles size={13} className="text-[#2563eb]" />
             <span>THE HASH STORE STANDARD</span>
           </div>
