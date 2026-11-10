@@ -10,7 +10,6 @@ import {
   Check,
   ShoppingBag,
   AlertCircle,
-  Calendar,
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
@@ -129,6 +128,16 @@ export default function Checkout() {
     setSubmitting(false);
 
     if (result && result.ok && result.order) {
+      if (formData.email) {
+        try {
+          sessionStorage.setItem(
+            "hash-guest-email",
+            formData.email.trim().toLowerCase(),
+          );
+        } catch {
+          // ignore if sessionStorage is unavailable
+        }
+      }
       setPlacedOrder(result.order);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -228,10 +237,10 @@ export default function Checkout() {
               {(placedOrder.items || []).map((it, idx) => (
                 <div key={idx} className="flex justify-between items-center py-2 text-xs">
                   <span className="text-[#334155] font-medium truncate max-w-[240px]">
-                    {it.name || `Product #${it.id}`} × {it.qty}
+                    {it.product?.name || `Product #${it.id}`} × {it.qty}
                   </span>
                   <span className="font-bold text-[#17233b]">
-                    {currency(Number(it.price) * Number(it.qty))}
+                    {currency(Number(it.product?.price || 0) * Number(it.qty))}
                   </span>
                 </div>
               ))}

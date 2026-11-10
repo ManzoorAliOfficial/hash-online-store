@@ -17,7 +17,6 @@ export default function LoginForm() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -120,21 +119,6 @@ export default function LoginForm() {
         </div>
       </div>
 
-      {/* Remember Me */}
-      <div className="flex items-center justify-between pt-0.5">
-        <label className="flex cursor-pointer items-center gap-2 select-none">
-          <input
-            type="checkbox"
-            name="rememberMe"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-            className="size-4 cursor-pointer rounded border-[#cbd5e1] text-[#2563eb] accent-[#2563eb] focus:ring-[#2563eb]"
-          />
-          <span className="text-xs font-medium text-[#52617a]">
-            Remember me on this device
-          </span>
-        </label>
-      </div>
 
       {/* Submit Button */}
       <button

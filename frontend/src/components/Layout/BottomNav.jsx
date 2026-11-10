@@ -1,4 +1,4 @@
-import { NavLink, Link } from "react-router";
+import { NavLink } from "react-router";
 import { Home, Grid, ShoppingBag, UserRound } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
 

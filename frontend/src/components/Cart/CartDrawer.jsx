@@ -8,7 +8,6 @@ import {
   Minus,
   Trash2,
   Truck,
-  Sparkles,
   ShieldCheck,
 } from "lucide-react";
 import { useStore } from "../../context/StoreContext";

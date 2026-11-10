@@ -10,7 +10,6 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
-  CheckCircle2,
 } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
 

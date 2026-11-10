@@ -37,6 +37,16 @@ export default function ProductDetails() {
   const [activeTab, setActiveTab] = useState("description");
   const [openFaq, setOpenFaq] = useState(null);
 
+  const [recentlyViewedIds, setRecentlyViewedIds] = useState(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem("hash_recently_viewed") || "[]",
+      );
+    } catch {
+      return [];
+    }
+  });
+
   // Recently Viewed persistence in localStorage
   useEffect(() => {
     if (!product?.id) return;
@@ -47,8 +57,11 @@ export default function ProductDetails() {
       const filtered = stored.filter((item) => item !== product.id);
       const updated = [product.id, ...filtered].slice(0, 8);
       localStorage.setItem("hash_recently_viewed", JSON.stringify(updated));
+      setRecentlyViewedIds(updated);
     } catch {
-      // localStorage disabled or private browsing
+      setRecentlyViewedIds((prev) =>
+        [product.id, ...prev.filter((item) => item !== product.id)].slice(0, 8),
+      );
     }
   }, [product?.id]);
 
@@ -68,21 +81,15 @@ export default function ProductDetails() {
 
   const productReviews = reviews.filter(
     (r) =>
-      r.productId === product.id ||
-      r.product === product.name ||
-      r.productName === product.name,
+      r.status === "Published" &&
+      (r.productId === product.id ||
+        r.product === product.name ||
+        r.productName === product.name),
   );
 
-  // Retrieve recently viewed products from localStorage (excluding current item)
-  let recentlyViewedIds = [];
-  try {
-    recentlyViewedIds = JSON.parse(
-      localStorage.getItem("hash_recently_viewed") || "[]",
-    ).filter((item) => item !== product.id);
-  } catch {
-    recentlyViewedIds = [];
-  }
+  // Retrieve recently viewed products from state (excluding current item)
   const recentlyViewedProducts = recentlyViewedIds
+    .filter((recId) => recId !== product.id)
     .map((recId) => products.find((p) => p.id === recId))
     .filter(Boolean)
     .slice(0, 4);
@@ -388,7 +395,7 @@ export default function ProductDetails() {
                     productId: product.id,
                     productName: product.name,
                   });
-                  notify("Review submitted successfully!");
+                  notify("Thanks! Your review will appear after approval.");
                 }}
               />
             </div>

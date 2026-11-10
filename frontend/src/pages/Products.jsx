@@ -6,7 +6,6 @@ import {
   LayoutGrid,
   List,
   RotateCcw,
-  Sparkles,
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
