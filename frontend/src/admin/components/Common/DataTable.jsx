@@ -6,14 +6,21 @@ export default function DataTable({ columns = [], rows = [], actions }) {
       </p>
     );
   return (
-    <div className="overflow-x-auto">
+    <div
+      className="overflow-x-auto rounded-md focus-visible:outline-offset-2"
+      role="region"
+      aria-label={`Scrollable ${columns.join(", ")} table`}
+      tabIndex={0}
+    >
       <table className="w-full min-w-[680px] border-separate border-spacing-0 text-left">
+        <caption className="sr-only">{columns.join(", ")}</caption>
         <thead>
           <tr>
             {columns.map((column) => (
               <th
                 className="border-b border-[#e4eaf3] bg-[#f8fafd] px-4 py-3 text-[10px] font-extrabold uppercase tracking-[.08em] text-[#71809a]"
                 key={column}
+                scope="col"
               >
                 {column}
               </th>

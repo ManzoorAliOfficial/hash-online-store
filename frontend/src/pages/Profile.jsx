@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 import LoginForm from "../components/Auth/LoginForm";
 import ProfileInfo from "../components/Profile/ProfileInfo";
 import AddressBook from "../components/Profile/AddressBook";
@@ -22,7 +23,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <main className="mx-auto min-h-[55vh] w-full max-w-[1120px] px-4 py-12 max-[600px]:py-7">
+      <Container as="main" className="min-h-[55vh] py-12 max-[600px]:py-7">
         <PageHeading eyebrow="YOUR ACCOUNT" title="Sign in to your account">
           <p>
             Sign in to manage saved details, view purchase history and update
@@ -30,7 +31,7 @@ export default function Profile() {
           </p>
         </PageHeading>
         <LoginForm />
-      </main>
+      </Container>
     );
   }
 
@@ -45,7 +46,7 @@ export default function Profile() {
   };
 
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
       <PageHeading eyebrow="YOUR ACCOUNT" title="My account">
         <p>
           Manage profile information, saved delivery addresses and account
@@ -153,12 +154,26 @@ export default function Profile() {
             </div>
           )}
           {activeSection === "settings" && (
-            <div id="account-settings">
-              <AccountSettings />
-            </div>
+            user.role === "admin" ? (
+              <section
+                id="account-settings"
+                className="grid gap-2 rounded-xl border border-[#e4eaf3] bg-white p-5 shadow-[0_8px_24px_rgba(16,36,73,.04)]"
+              >
+                <h2 className="text-lg font-bold text-[#17233b]">
+                  Security settings
+                </h2>
+                <p className="text-xs leading-5 text-[#71809a]" role="status">
+                  The local admin preview has no password account to update. Password changes are unavailable for this demo session.
+                </p>
+              </section>
+            ) : (
+              <div id="account-settings">
+                <AccountSettings />
+              </div>
+            )
           )}
         </section>
       </div>
-    </main>
+    </Container>
   );
 }

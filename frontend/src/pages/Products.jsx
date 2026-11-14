@@ -9,19 +9,28 @@ import {
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 import ProductFilters from "../components/Products/ProductFilters";
 import ProductToolbar from "../components/Products/ProductToolbar";
 import SortBar from "../components/Products/SortBar";
 import ProductGrid from "../components/Products/ProductGrid";
 import ProductPagination from "../components/Products/ProductPagination";
+import AccessoriesLink from "../components/Common/AccessoriesLink";
 import EmptyState from "../components/Common/EmptyState";
+import {
+  getAccessoryCollectionProducts,
+  getAccessoryCollectionTitle,
+  getMobileAccessories,
+} from "../utils/homeCatalog";
 
 export default function Products() {
-  const { products } = useStore();
+  const { products, orders = [] } = useStore();
   const [params, setParams] = useSearchParams();
   const [query, setQuery] = useState(params.get("search") || params.get("q") || "");
   const [category, setCategory] = useState(params.get("category") || "All");
+  const [collection, setCollection] = useState(params.get("collection") || "");
   const [sort, setSort] = useState("Featured");
+  const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(400000);
   const [rating, setRating] = useState(0);
   const [inStock, setInStock] = useState(false);
@@ -30,21 +39,26 @@ export default function Products() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const itemsPerPage = 12;
 
-  // Sync category & search if URL parameters change
+  // Keep direct catalog links (category, collection and price bands) in sync.
   useEffect(() => {
-    const urlCategory = params.get("category");
-    if (urlCategory) setCategory(urlCategory);
-    const urlSearch = params.get("search") || params.get("q");
-    if (urlSearch !== null && urlSearch !== undefined) setQuery(urlSearch);
+    setCategory(params.get("category") || "All");
+    setQuery(params.get("search") || params.get("q") || "");
+    setCollection(params.get("collection") || "");
+    const urlMin = Number(params.get("minPrice"));
+    const urlMax = Number(params.get("maxPrice"));
+    setMinPrice(Number.isFinite(urlMin) && params.has("minPrice") ? Math.max(0, urlMin) : 0);
+    setMaxPrice(Number.isFinite(urlMax) && params.has("maxPrice") ? Math.max(0, urlMax) : 400000);
   }, [params]);
 
   // Reset to page 1 whenever filters change
   useEffect(() => {
     setPage(1);
-  }, [category, query, sort, maxPrice, rating, inStock]);
+  }, [category, collection, query, sort, minPrice, maxPrice, rating, inStock]);
 
   const reset = () => {
     setCategory("All");
+    setCollection("");
+    setMinPrice(0);
     setMaxPrice(400000);
     setRating(0);
     setInStock(false);
@@ -52,18 +66,39 @@ export default function Products() {
     setParams({});
   };
 
+  const updateCategory = (newCategory) => {
+    setCategory(newCategory);
+    const nextParams = new URLSearchParams(params);
+    if (newCategory === "All") nextParams.delete("category");
+    else nextParams.set("category", newCategory);
+    if (query.trim()) nextParams.set("search", query.trim());
+    else {
+      nextParams.delete("search");
+      nextParams.delete("q");
+    }
+    setParams(nextParams);
+  };
+
   const hasActiveFilters =
     category !== "All" ||
+    Boolean(collection) ||
     query.trim() !== "" ||
+    minPrice > 0 ||
     maxPrice < 400000 ||
     rating > 0 ||
     inStock;
 
   const filtered = useMemo(() => {
-    const list = products.filter(
+    const collectionProducts = getAccessoryCollectionProducts(
+      products,
+      collection,
+      orders,
+    );
+    const list = collectionProducts.filter(
       (p) =>
         (category === "All" || p.category === category) &&
         p.name.toLowerCase().includes(query.toLowerCase()) &&
+        p.price >= minPrice &&
         p.price <= maxPrice &&
         p.rating >= rating &&
         (!inStock || p.stock > 0),
@@ -72,7 +107,13 @@ export default function Products() {
     if (sort === "Price: High to low") list.sort((a, b) => b.price - a.price);
     if (sort === "Top rated") list.sort((a, b) => b.rating - a.rating);
     return list;
-  }, [products, category, query, sort, maxPrice, rating, inStock]);
+  }, [products, orders, category, collection, query, sort, minPrice, maxPrice, rating, inStock]);
+
+  const removeParam = (name) => {
+    const nextParams = new URLSearchParams(params);
+    nextParams.delete(name);
+    setParams(nextParams);
+  };
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const paginatedProducts = useMemo(() => {
@@ -81,8 +122,8 @@ export default function Products() {
   }, [filtered, page]);
 
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
-      <PageHeading eyebrow="THE COLLECTION" title="Our products">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
+      <PageHeading eyebrow="THE COLLECTION" title={getAccessoryCollectionTitle(collection)}>
         <p>Find the right tech and everyday essentials for your day.</p>
       </PageHeading>
 
@@ -129,14 +170,13 @@ export default function Products() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[300px_minmax(0,1fr)] gap-8 max-[1100px]:grid-cols-[260px_minmax(0,1fr)] max-[850px]:grid-cols-1">
+      <div className="grid grid-cols-[280px_minmax(0,1fr)] gap-8 max-[1100px]:grid-cols-[260px_minmax(0,1fr)] max-[850px]:grid-cols-1">
         {/* Desktop Sidebar Filters */}
         <div className="hidden min-[850px]:block">
           <ProductFilters
             category={category}
             onChange={(newCategory) => {
-              setCategory(newCategory);
-              setParams(newCategory === "All" ? {} : { category: newCategory });
+              updateCategory(newCategory);
             }}
             maxPrice={maxPrice}
             onMaxPrice={setMaxPrice}
@@ -178,8 +218,7 @@ export default function Products() {
                 <ProductFilters
                   category={category}
                   onChange={(newCategory) => {
-                    setCategory(newCategory);
-                    setParams(newCategory === "All" ? {} : { category: newCategory });
+                    updateCategory(newCategory);
                   }}
                   maxPrice={maxPrice}
                   onMaxPrice={setMaxPrice}
@@ -249,14 +288,20 @@ export default function Products() {
             <div className="mb-5 flex flex-wrap items-center gap-2 rounded-xl border border-[#e8eff9] bg-[#f8fafd] p-3">
               <span className="text-[11px] font-bold text-[#64748b]">Active filters:</span>
 
+              {collection && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#bfd4ff] bg-[#eff4ff] px-2.5 py-1 text-xs font-semibold text-[#2563eb]">
+                  <span>{getAccessoryCollectionTitle(collection)}</span>
+                  <button type="button" onClick={() => removeParam("collection")} className="hover:text-[#1d4ed8]" aria-label="Remove mobile accessories filter"><X size={13} /></button>
+                </span>
+              )}
+
               {category !== "All" && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#bfd4ff] bg-[#eff4ff] px-2.5 py-1 text-xs font-semibold text-[#2563eb]">
                   <span>Category: {category}</span>
                   <button
                     type="button"
                     onClick={() => {
-                      setCategory("All");
-                      setParams({});
+                      updateCategory("All");
                     }}
                     className="hover:text-[#1d4ed8]"
                     aria-label="Remove category filter"
@@ -280,12 +325,19 @@ export default function Products() {
                 </span>
               )}
 
+              {minPrice > 0 && (
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#bfd4ff] bg-[#eff4ff] px-2.5 py-1 text-xs font-semibold text-[#2563eb]">
+                  <span>From Rs. {minPrice.toLocaleString()}</span>
+                  <button type="button" onClick={() => removeParam("minPrice")} className="hover:text-[#1d4ed8]" aria-label="Remove minimum price filter"><X size={13} /></button>
+                </span>
+              )}
+
               {maxPrice < 400000 && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#bfd4ff] bg-[#eff4ff] px-2.5 py-1 text-xs font-semibold text-[#2563eb]">
                   <span>Under Rs. {maxPrice.toLocaleString()}</span>
                   <button
                     type="button"
-                    onClick={() => setMaxPrice(400000)}
+                    onClick={() => removeParam("maxPrice")}
                     className="hover:text-[#1d4ed8]"
                     aria-label="Remove price filter"
                   >
@@ -361,8 +413,17 @@ export default function Products() {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           />
+          {!collection &&
+            category === "All" &&
+            !query.trim() &&
+            getMobileAccessories(products).length > itemsPerPage && (
+              <AccessoriesLink
+                totalCount={getMobileAccessories(products).length}
+                visibleCount={itemsPerPage}
+              />
+            )}
         </section>
       </div>
-    </main>
+    </Container>
   );
 }

@@ -1,10 +1,11 @@
 import { Link } from "react-router";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 
 export default function Terms() {
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
       <PageHeading eyebrow="STORE INFORMATION" title="Terms & Conditions">
         <p>
           A clear overview of how Hash Online Store policies and orders work.
@@ -18,9 +19,9 @@ export default function Terms() {
             Storefront & ordering notice
           </b>
           <p className="mt-1.5 text-xs leading-6 text-[#52617a]">
-            Hash Online Store provides an authentic collection of consumer
-            technology and lifestyle accessories. All orders are processed with
-            verified parcel tracking and transparent delivery status updates.
+            This frontend demo uses browser-local catalog and order data. It
+            does not connect to live inventory, payment processing, or courier
+            tracking services.
           </p>
         </div>
       </div>
@@ -32,8 +33,8 @@ export default function Terms() {
           </h2>
           <p className="mt-2 text-xs leading-6 text-[#71809a]">
             Product descriptions, prices in PKR, stock counts, and promotional
-            discounts reflect current store inventory and are updated in real
-            time.
+            discounts are sample data for this frontend demo and are not a live
+            inventory feed.
           </p>
         </section>
         <section className="rounded-xl border border-[#e4eaf3] bg-white p-5 shadow-[0_2px_8px_rgba(16,36,73,.02)]">
@@ -41,9 +42,9 @@ export default function Terms() {
             Orders and payment
           </h2>
           <p className="mt-2 text-xs leading-6 text-[#71809a]">
-            Cash on Delivery (COD) is available nationwide. Online credit/debit
-            card checkout will be supported directly via secure payment
-            gateways.
+            Checkout demonstrates Cash on Delivery (COD). Orders are stored in
+            this browser only; no payment is processed. Online card checkout
+            requires a connected payment provider.
           </p>
         </section>
         <section className="rounded-xl border border-[#e4eaf3] bg-white p-5 shadow-[0_2px_8px_rgba(16,36,73,.02)]">
@@ -51,9 +52,9 @@ export default function Terms() {
             Delivery and logistics
           </h2>
           <p className="mt-2 text-xs leading-6 text-[#71809a]">
-            Deliveries are handled by licensed domestic courier partners (TCS,
-            Leopards, Trax, M&P). Standard transit times range between 2 to 4
-            business days.
+            Courier settings in this demo are previews only. The site does not
+            book shipments or provide live courier tracking. Actual delivery
+            availability and transit times must be confirmed by the store.
           </p>
         </section>
         <section className="rounded-xl border border-[#e4eaf3] bg-white p-5 shadow-[0_2px_8px_rgba(16,36,73,.02)]">
@@ -61,9 +62,9 @@ export default function Terms() {
             Returns, replacements and customer support
           </h2>
           <p className="mt-2 text-xs leading-6 text-[#71809a]">
-            We provide a 7-day checking and replacement window for any
-            manufacturer defects or transit damage. Please contact our support
-            team for prompt resolution.
+            The 7-day checking and replacement window shown here is sample demo
+            policy text. Confirm the store’s current return policy before
+            placing a real order.
           </p>
           <Link
             to="/contact"
@@ -73,6 +74,6 @@ export default function Terms() {
           </Link>
         </section>
       </div>
-    </main>
+    </Container>
   );
 }

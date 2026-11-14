@@ -1,401 +1,162 @@
-import { useEffect, useState, useMemo } from "react";
-import {
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Headphones,
-  Laptop,
-  Pause,
-  Play,
-  Smartphone,
-  Star,
-  TrendingUp,
-  Sparkles,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
+import { ArrowLeft, ArrowRight, AudioLines, Pause, Play, Star } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
+import { getMobileAccessories } from "../../utils/homeCatalog";
+import Container from "../Layout/Container";
 
-const slides = [
-  {
-    category: "Phones",
-    eyebrow: "THE SMARTER WAY TO SHOP",
-    badgeText: "Flagship 2026",
-    title: "Good finds.",
-    highlight: "Better living.",
-    description:
-      "Discover trusted tech and everyday essentials, chosen to make daily life a little easier.",
-    image:
-      "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?auto=format&fit=crop&w=900&h=1000&q=85",
-    accent:
-      "https://images.unsplash.com/photo-1733556046403-2d090cf359a3?auto=format&fit=crop&w=700&h=700&q=85",
-    alt: "Featured smartphone",
-    accentAlt: "Wireless earbuds",
-    icon: Smartphone,
-    label: "Featured this week",
-    caption: "Technology that moves with you",
-    ctaLink: "/products?category=Phones",
-    ctaText: "Shop phones",
-  },
-  {
-    category: "Audio",
-    eyebrow: "SOUND FOR EVERY MOMENT",
-    badgeText: "Spatial Audio",
-    title: "Listen closer.",
-    highlight: "Tune everything out.",
-    description:
-      "Find your focus with comfortable audio gear and clear, immersive sound.",
-    image:
-      "https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=900&h=1000&q=85",
-    accent:
-      "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=700&h=700&q=85",
-    alt: "Premium headphones",
-    accentAlt: "Portable Bluetooth speaker",
-    icon: Headphones,
-    label: "Audio favorites",
-    caption: "Your sound, your space",
-    ctaLink: "/products?category=Audio",
-    ctaText: "Shop audio",
-  },
-  {
-    category: "Laptops",
-    eyebrow: "READY FOR WHAT’S NEXT",
-    badgeText: "M2 Performance",
-    title: "Make room for",
-    highlight: "a better workflow.",
-    description:
-      "Power through work, study and creative projects with thoughtfully selected tech.",
-    image:
-      "https://images.unsplash.com/photo-1629131726692-1accd0c53ce0?auto=format&fit=crop&w=900&h=1000&q=85",
-    accent:
-      "https://images.unsplash.com/photo-1624096104992-9b4fa3a279dd?auto=format&fit=crop&w=700&h=700&q=85",
-    alt: "Laptop for work and study",
-    accentAlt: "Smart watch",
-    icon: Laptop,
-    label: "Work and create",
-    caption: "Tools for your everyday",
-    ctaLink: "/products?category=Laptops",
-    ctaText: "Shop laptops",
-  },
-];
+const money = (value) => `Rs. ${Number(value || 0).toLocaleString("en-PK")}`;
+const heroBackdropUrl =
+  "https://images.unsplash.com/photo-1758578070291-0c22ff555df9?auto=format&fit=crop";
 
 export default function Hero() {
   const { products = [] } = useStore();
+  const accessoryProducts = useMemo(
+    () => getMobileAccessories(products).filter((product) => product.image),
+    [products],
+  );
+  const slides = useMemo(() => {
+    const accessoryPicks = accessoryProducts.filter((product) =>
+      /earbud|headphone|charger|powercore|speaker|stand/i.test(product.name || ""),
+    );
+    const preferred = accessoryPicks.length ? accessoryPicks : accessoryProducts;
+    return [...preferred].sort((a, b) => {
+      const reviewDifference = Number(b.reviews || 0) - Number(a.reviews || 0);
+      return reviewDifference || Number(b.rating || 0) - Number(a.rating || 0);
+    }).slice(0, 4);
+  }, [accessoryProducts]);
   const [active, setActive] = useState(0);
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [imageErrors, setImageErrors] = useState({});
-
-  const slide = slides[active];
-  const Icon = slide.icon;
-
-  // Real lowest price in slide's category
-  const startingPrice = useMemo(() => {
-    const matching = products.filter(
-      (p) =>
-        (p.category || "").toLowerCase() ===
-        (slide.category || "").toLowerCase(),
-    );
-    if (!matching.length) return "Rs. 19,999";
-    const min = Math.min(...matching.map((p) => Number(p.price || 0)));
-    return `Rs. ${min.toLocaleString()}`;
-  }, [products, slide.category]);
-
-  // Real average rating & review count from products
-  const ratingData = useMemo(() => {
-    const rated = products.filter(
-      (p) => Number(p.reviews || 0) > 0 && Number(p.rating || 0) > 0,
-    );
-    if (!rated.length) return null;
-    const avg =
-      rated.reduce((sum, p) => sum + Number(p.rating), 0) / rated.length;
-    const totalReviews = rated.reduce(
-      (sum, p) => sum + Number(p.reviews || 0),
-      0,
-    );
-    return {
-      score: avg.toFixed(1),
-      count: totalReviews,
-    };
-  }, [products]);
-
-  // Real trending products (top 4 by reviews count)
-  const trendingProducts = useMemo(() => {
-    return [...products]
-      .sort((a, b) => Number(b.reviews || 0) - Number(a.reviews || 0))
-      .slice(0, 4);
-  }, [products]);
-
-  // Auto-rotation (disabled on mobile screens < 600px and prefers-reduced-motion)
-  useEffect(() => {
-    const isMobile =
-      typeof window !== "undefined" &&
-      window.matchMedia("(max-width: 599px)").matches;
-    const prefersReducedMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (hovered || focused || paused || isMobile || prefersReducedMotion) {
-      return;
+  const product = slides[active];
+  const prices = accessoryProducts.map((item) => Number(item.price)).filter(Number.isFinite);
+  const startingPrice = prices.length ? Math.min(...prices) : Number(product?.price || 0);
+  const trending = useMemo(
+    () => [...accessoryProducts].sort((a, b) => Number(b.reviews || 0) - Number(a.reviews || 0)).slice(0, 4),
+    [accessoryProducts],
+  );
+  const reviewSummary = useMemo(() => accessoryProducts.reduce((summary, item) => {
+    const rating = Number(item.rating);
+    const reviews = Number(item.reviews);
+    if (rating > 0 && reviews > 0) {
+      summary.total += reviews;
+      summary.weightedRating += rating * reviews;
     }
-    const timer = window.setInterval(
-      () => setActive((i) => (i + 1) % slides.length),
-      6000,
-    );
+    return summary;
+  }, { total: 0, weightedRating: 0 }), [accessoryProducts]);
+  const secondaryAccessory = accessoryProducts.find((item) => item.id !== product?.id && /earbud|airpods|earphone/i.test(item.name))
+    || accessoryProducts.find((item) => item.id !== product?.id);
+
+  useEffect(() => {
+    if (paused || slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % slides.length), 6000);
     return () => window.clearInterval(timer);
-  }, [hovered, focused, paused]);
+  }, [paused, slides.length]);
 
-  const go = (step) =>
-    setActive((i) => (i + step + slides.length) % slides.length);
+  if (!product) {
+    return <section className="w-full bg-white">
+      <Container className="py-14">
+      <p className="text-xs font-bold uppercase tracking-[.16em] text-[#2563eb]">HASH ONLINE STORE</p>
+      <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#102449]">Upgrade your everyday<br />experience.</h1>
+      <Link to="/products?collection=mobile-accessories" className="mt-6 inline-flex rounded-full bg-[#2563eb] px-5 py-3 text-sm font-bold text-white">Shop accessories</Link>
+      </Container>
+    </section>;
+  }
 
-  return (
-    <section
-      className="relative mx-auto mt-8 flex flex-col md:grid md:grid-cols-2 min-h-[480px] max-w-[1200px] overflow-hidden rounded-[22px] border border-[#e2e8f0] bg-white shadow-[0_4px_24px_rgba(15,23,42,0.03)] max-[900px]:mx-[4%] max-[900px]:mt-5 max-[900px]:min-h-[400px] max-[600px]:mx-3 max-[600px]:mt-3 max-[600px]:min-h-0"
-      aria-roledescription="carousel"
-      aria-label="Featured products"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onKeyDown={(e) => {
-        if (e.key === "ArrowRight") go(1);
-        if (e.key === "ArrowLeft") go(-1);
-      }}
-      onFocusCapture={() => setFocused(true)}
-      onBlurCapture={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget)) setFocused(false);
-      }}
-    >
-      {/* Visual Section: order-1 on mobile (<md) so first screen shows the featured product, order-2 on desktop */}
-      <div
-        className="order-1 md:order-2 relative grid min-h-[300px] place-items-center bg-[radial-gradient(ellipse_at_55%_48%,#d9e7ff_0,#edf3fd_48%,#ffffff_75%)] max-[900px]:min-h-[340px] max-[600px]:min-h-[250px] max-[600px]:py-6"
-        key={`visual-${active}`}
-      >
-        <div className="absolute size-[280px] rounded-full bg-[linear-gradient(145deg,#d4e4ff,#b7d0ff)] blur-[1px] max-[600px]:size-[190px]" />
+  const next = () => setActive((current) => (current + 1) % slides.length);
+  const previous = () => setActive((current) => (current - 1 + slides.length) % slides.length);
+  const featuredHref = "/products?collection=mobile-accessories";
 
-        {/* Primary Product Image */}
-        <div className="absolute z-[1] grid place-items-center drop-shadow-[0_30px_26px_#243c6630]">
-          {imageErrors.primary ? (
-            <Icon
-              className="size-40 -rotate-[9deg] text-[#203d70] max-[600px]:size-28"
-              strokeWidth={1.15}
-            />
-          ) : (
-            <img
-              className="h-[285px] w-[205px] rounded-[28px] object-cover shadow-[0_30px_26px_#243c6630] max-[600px]:h-[185px] max-[600px]:w-[135px]"
-              src={slide.image}
-              alt={slide.alt}
-              width="205"
-              height="285"
-              fetchPriority={active === 0 ? "high" : "auto"}
-              decoding="async"
-              onError={() =>
-                setImageErrors((value) => ({ ...value, primary: true }))
-              }
-            />
-          )}
-        </div>
-
-        {/* Accent floating cutout image */}
-        <div className="absolute bottom-[21%] right-[19%] z-[2] grid place-items-center rotate-[13deg] drop-shadow-[0_18px_15px_#243c6630] max-[600px]:bottom-[16%] max-[600px]:right-[14%]">
-          {imageErrors.accent ? (
-            <Headphones
-              className="size-20 text-[#203d70] max-[600px]:size-14"
-              strokeWidth={1.2}
-            />
-          ) : (
-            <img
-              className="size-[100px] rounded-full object-cover shadow-lg max-[600px]:size-[64px]"
-              src={slide.accent}
-              alt={slide.accentAlt}
-              width="100"
-              height="100"
-              loading="lazy"
-              decoding="async"
-              onError={() =>
-                setImageErrors((value) => ({ ...value, accent: true }))
-              }
-            />
-          )}
-        </div>
-
-        {/* Badge with starting price */}
-        <div className="absolute right-[10%] top-[12%] z-[2] flex items-center gap-2.5 rounded-2xl border border-white/70 bg-white/95 px-3.5 py-2 shadow-[0_12px_24px_rgba(23,35,59,0.12)] backdrop-blur-md max-[600px]:right-[6%] max-[600px]:top-[6%] max-[600px]:px-2.5 max-[600px]:py-1.5">
-          <div className="grid size-7 place-items-center rounded-xl bg-[#eff4ff] text-[#2563eb] max-[600px]:size-6">
-            <Sparkles size={14} className="max-[600px]:size-3.5" />
-          </div>
-          <div className="text-left">
-            <span className="block text-xs font-extrabold uppercase tracking-wider text-[#2563eb]">
-              {slide.badgeText}
-            </span>
-            <b className="block text-xs font-bold text-[#17233b]">
-              From {startingPrice}
-            </b>
-          </div>
-        </div>
-
-        {/* Caption bar */}
-        <div className="absolute bottom-[23px] left-[30px] right-[30px] flex justify-between rounded-[10px] bg-[#ffffffd9] px-4 py-2.5 text-xs text-[#66758e] backdrop-blur-[8px] max-[600px]:hidden">
-          <span>{slide.label}</span>
-          <b className="text-[#243552]">{slide.caption}</b>
-        </div>
-      </div>
-
-      {/* Text Copy Section: order-2 on mobile, order-1 on desktop */}
-      <div
-        className="order-2 md:order-1 self-center px-[11%] pb-[60px] pt-[45px] max-[900px]:px-[7%] max-[900px]:py-[40px] max-[600px]:px-[22px] max-[600px]:pb-6 max-[600px]:pt-5"
-        key={`copy-${active}`}
-        role="group"
-        aria-roledescription="slide"
-        aria-label={`${active + 1} of ${slides.length}`}
-        aria-live={hovered || focused || paused ? "polite" : "off"}
-      >
-        <div className="inline-flex items-center gap-2 rounded-full border border-[#dce5f3] bg-white px-3 py-1 text-xs font-bold text-[#17233b] shadow-2xs">
-          <span className="size-2 rounded-full bg-[#16803b] animate-pulse" />
-          <span className="text-xs font-extrabold uppercase tracking-wider text-[#2563eb]">
-            {slide.eyebrow}
-          </span>
-          <span className="text-[#c1cbd8]">·</span>
-          <span className="text-xs font-semibold text-[#52617a]">
-            From {startingPrice}
-          </span>
-        </div>
-
-        <h1 className="my-3 text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl lg:text-[54px] leading-[1.08] text-[#071a3d]">
-          {slide.title}
-          <br />
-          <em className="not-italic text-[#2563eb]">{slide.highlight}</em>
-        </h1>
-
-        <p className="max-w-[410px] text-xs sm:text-sm leading-relaxed text-[#71809a]">
-          {slide.description}
+  return <section
+    aria-label="Featured products"
+    aria-roledescription="carousel"
+    className="relative w-full overflow-hidden bg-[#f0f5fc]"
+    onMouseEnter={() => setPaused(true)}
+    onMouseLeave={() => setPaused(false)}
+    onFocus={() => setPaused(true)}
+    onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false); }}
+  >
+    <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+      <img
+        src={`${heroBackdropUrl}&w=1920&q=78`}
+        srcSet={`${heroBackdropUrl}&w=640&q=72 640w, ${heroBackdropUrl}&w=960&q=74 960w, ${heroBackdropUrl}&w=1440&q=76 1440w, ${heroBackdropUrl}&w=1920&q=78 1920w`}
+        sizes="(max-width: 90rem) 100vw, 90rem"
+        alt=""
+        loading="eager"
+        fetchPriority="high"
+        decoding="async"
+        className="absolute left-1/2 top-0 h-full w-full max-w-site -translate-x-1/2 object-cover object-[68%_center] opacity-40"
+      />
+      <div className="absolute left-1/2 top-0 h-full w-full max-w-site -translate-x-1/2 bg-[linear-gradient(100deg,rgba(245,248,253,.92)_0%,rgba(245,248,253,.78)_46%,rgba(245,248,253,.92)_100%)]" />
+    </div>
+    <Container className="relative z-10 grid min-h-[440px] items-center gap-1 pb-5 pt-7 sm:min-h-[470px] sm:pb-6 lg:min-h-[390px] lg:grid-cols-[1.1fr_1fr] lg:gap-6 lg:pb-8 lg:pt-4">
+      <div className="relative z-10 max-w-[530px]">
+        <p className="inline-flex items-center gap-2 rounded-full border border-[#e4ebf5] bg-white/90 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.13em] text-[#2563eb]">
+          <span className="size-1.5 shrink-0 rounded-full bg-emerald-500" />
+          Mobile accessories for every day
+          <span className="font-medium normal-case tracking-normal text-[#64748b]">· &nbsp;From {money(startingPrice)}</span>
         </p>
 
-        {/* CTA Buttons with Category Deep-link and #categories Target */}
-        <div className="mt-5 sm:mt-6 flex flex-wrap gap-2.5 sm:gap-3">
-          <Link
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-5 py-3 text-xs font-bold text-white shadow-md transition hover:bg-[#1d4ed8] active:scale-95"
-            to={slide.ctaLink}
-          >
-            <span>{slide.ctaText}</span>
-            <ArrowRight size={15} />
+        <h1 className="mt-4 text-[clamp(2.55rem,5.4vw,4.25rem)] font-semibold leading-[.91] tracking-[-.06em] text-[#17233f] lg:mt-3 lg:text-[2.5rem]">
+          <><span className="block">Upgrade your</span><span className="block text-[#2563eb]">everyday experience.</span></>
+        </h1>
+
+        <p className="mt-4 max-w-[390px] text-[11px] leading-[1.7] text-[#71809a] sm:text-xs lg:mt-3">
+          Explore earbuds, chargers and useful accessories for life on the move.
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-2.5 lg:mt-3">
+          <Link to={featuredHref} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#2563eb] px-4 text-[11px] font-bold text-white transition hover:bg-[#1d4ed8]">
+            Shop accessories<ArrowRight size={14} />
           </Link>
-          <a
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#e1e7f0] bg-white px-5 py-3 text-xs font-bold text-[#20304b] transition hover:border-[#aac4f3] hover:bg-[#f2f6ff] active:scale-95"
-            href="#categories"
-          >
+          <a href="#home-categories" className="inline-flex min-h-10 items-center rounded-lg border border-[#dce5f3] bg-white/85 px-4 text-[11px] font-semibold text-[#334560] hover:border-[#a9c2e8]">
             Explore categories
           </a>
         </div>
 
-        {/* Customer Rating from real product data */}
-        {ratingData && (
-          <div className="mt-[22px] flex items-center gap-3 text-xs text-[#61708a]">
-            <span className="inline-flex items-center gap-1.5">
-              <Star size={14} className="text-[#f5a623]" fill="currentColor" />
-              <b className="text-[#17233b]">{ratingData.score}/5</b> customer
-              rating
+        <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[9px] text-[#64748b] sm:text-[10px] lg:mt-3">
+          {(reviewSummary.total > 0 || Number(product.rating) > 0) && <>
+            <span className="inline-flex items-center gap-1 font-bold text-[#334560]"><Star size={11} fill="currentColor" className="text-amber-400" />{(reviewSummary.total ? reviewSummary.weightedRating / reviewSummary.total : Number(product.rating)).toFixed(1)}/5 <span className="font-normal text-[#94a3b8]">sample catalog rating</span></span>
+            <span className="hidden text-[#cbd5e1] sm:inline">·</span>
+            <span className="inline-flex items-center gap-0.5 text-amber-400" aria-label={`${(reviewSummary.total ? reviewSummary.weightedRating / reviewSummary.total : Number(product.rating)).toFixed(1)} out of 5 stars`}>
+              {Array.from({ length: 5 }, (_, index) => <Star key={index} size={10} fill="currentColor" />)}
             </span>
-            <span className="flex gap-0.5 text-[#f5a623]">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Star key={i} size={12} fill="currentColor" />
-              ))}
-            </span>
-            <span className="hidden sm:inline text-[#71809a]">
-              ({ratingData.count} reviews)
-            </span>
-          </div>
-        )}
-
-        {/* Trending Chips from real products */}
-        {trendingProducts.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-1.5 text-xs text-[#61708a] max-[600px]:mt-3">
-            <span className="flex items-center gap-1 font-bold text-[#17233b]">
-              <TrendingUp size={13} className="text-[#2563eb]" /> Trending:
-            </span>
-            {trendingProducts.map((p) => (
-              <Link
-                key={p.id}
-                to={`/products/${p.id}`}
-                className="inline-flex cursor-pointer items-center rounded-full border border-[#dce5f3] bg-white/90 px-3 py-0.5 text-xs font-semibold text-[#43536c] transition hover:border-[#2563eb] hover:bg-[#eff4ff] hover:text-[#2563eb]"
-              >
-                {p.name}
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* Carousel controls on mobile (below content) */}
-        <div className="mt-6 flex md:hidden items-center gap-2 pt-2 border-t border-[#edf2f9]">
-          <div
-            className="mr-2 flex items-center gap-[5px]"
-            role="group"
-            aria-label="Choose featured slide"
-          >
-            {slides.map((item, index) => (
-              <button
-                key={item.eyebrow}
-                className={`size-[7px] cursor-pointer rounded-full border-0 bg-[#a9b9d3] p-0 transition-[width,background] ${index === active ? "w-5 rounded-[5px] bg-[#2563eb]" : ""}`}
-                aria-label={`Show slide ${index + 1}: ${item.eyebrow}`}
-                aria-current={index === active ? "true" : undefined}
-                onClick={() => setActive(index)}
-              />
-            ))}
-          </div>
-          <button
-            className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white"
-            onClick={() => go(-1)}
-            aria-label="Previous slide"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white"
-            onClick={() => go(1)}
-            aria-label="Next slide"
-          >
-            <ChevronRight size={16} />
-          </button>
+            <span className="text-[#94a3b8]">({(reviewSummary.total || Number(product.reviews || 0)).toLocaleString("en-PK")} sample reviews · demo data)</span>
+          </>}
+          {trending.length > 0 && <>
+            <span className="hidden text-[#cbd5e1] sm:inline">·</span>
+            <span className="font-semibold text-[#334560]">Trending:</span>
+            {trending.map((item, index) => <Link key={item.id} to={`/products/${item.id}`} className={`${index > 2 ? "hidden lg:inline-flex" : "inline-flex"} rounded-full border border-[#e6ebf3] bg-white/85 px-2 py-1 text-[8px] font-medium hover:border-[#bfd3f5] hover:text-[#2563eb]`}>{item.name}</Link>)}
+          </>}
         </div>
       </div>
 
-      {/* Desktop Slider Controls */}
-      <div className="hidden md:flex absolute bottom-[22px] left-[11%] z-[4] items-center gap-[7px] max-[900px]:bottom-[17px] max-[900px]:left-[7%]">
-        <div
-          className="mr-1.5 flex items-center gap-[5px]"
-          role="group"
-          aria-label="Choose featured slide"
-        >
-          {slides.map((item, index) => (
-            <button
-              key={item.eyebrow}
-              className={`size-[7px] cursor-pointer rounded-full border-0 bg-[#a9b9d3] p-0 transition-[width,background] ${index === active ? "w-5 rounded-[5px] bg-[#2563eb]" : ""}`}
-              aria-label={`Show slide ${index + 1}: ${item.eyebrow}`}
-              aria-current={index === active ? "true" : undefined}
-              onClick={() => setActive(index)}
-            />
-          ))}
+      <div className="relative mx-auto mt-1 flex h-[190px] w-full max-w-[490px] items-center justify-center sm:h-[240px] lg:mt-0 lg:h-[260px] lg:justify-self-center">
+        <div className="absolute left-1/2 top-1/2 size-[190px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#dce8fa]/85 sm:size-[235px] lg:size-[270px]" aria-hidden="true" />
+        <div className="absolute left-1/2 top-1/2 z-10 h-[158px] w-[126px] -translate-x-1/2 -translate-y-1/2 rounded-[20px] bg-white sm:h-[205px] sm:w-[165px] lg:h-[238px] lg:w-[190px]" aria-hidden="true" />
+        <img key={product.id} src={product.image} alt={product.name} fetchPriority="high" decoding="async" className="relative z-20 h-[158px] w-[126px] rounded-[20px] object-cover motion-safe:animate-zoom-in motion-reduce:animate-none sm:h-[205px] sm:w-[165px] lg:h-[238px] lg:w-[190px]" />
+
+        {secondaryAccessory?.image && <div className="absolute bottom-[4%] right-[14%] z-30 size-[58px] overflow-hidden rounded-full border-[3px] border-white bg-white sm:right-[16%] sm:size-[72px] lg:right-[17%] lg:size-[82px]">
+          <img src={secondaryAccessory.image} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
+        </div>}
+
+        <div className="absolute right-0 top-0 z-30 flex items-center gap-2 rounded-xl border border-white bg-white/95 px-3 py-2">
+          <span className="grid size-6 place-items-center rounded-lg bg-[#eff5ff] text-[#2563eb]"><AudioLines size={13} /></span>
+          <span><span className="block text-[7px] font-bold uppercase tracking-wider text-[#2563eb]">Everyday accessories</span><span className="mt-0.5 block text-[9px] font-bold text-[#102449]">From {money(startingPrice)}</span></span>
         </div>
-        <button
-          className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white"
-          onClick={() => go(-1)}
-          aria-label="Previous slide"
-        >
-          <ChevronLeft size={17} />
-        </button>
-        <button
-          className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white"
-          onClick={() => go(1)}
-          aria-label="Next slide"
-        >
-          <ChevronRight size={17} />
-        </button>
-        <button
-          className="grid size-[30px] cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-[#ffffffdb] text-[#25416c] transition hover:bg-[#2563eb] hover:text-white"
-          onClick={() => setPaused((p) => !p)}
-          aria-label={paused ? "Play slideshow" : "Pause slideshow"}
-        >
-          {paused ? <Play size={14} /> : <Pause size={14} />}
-        </button>
       </div>
-    </section>
-  );
+
+      <div className="relative z-30 mt-1 flex items-center justify-between lg:absolute lg:bottom-4 lg:left-12 lg:right-12">
+        <span className="text-[9px] font-medium text-[#64748b]">Mobile accessory picks</span>
+        <div className="flex items-center gap-1.5">
+          <span className="mr-2 hidden text-[9px] font-semibold text-[#334560] sm:inline">{product.name}</span>
+          {slides.length > 1 && <>
+            <div className="mr-1 flex items-center gap-1" aria-label="Choose featured product">{slides.map((item, index) => <button key={item.id} type="button" onClick={() => setActive(index)} aria-label={`Show ${item.name}`} aria-current={active === index ? "true" : undefined} className={`h-1.5 rounded-full transition-all ${index === active ? "w-5 bg-[#2563eb]" : "w-1.5 bg-[#b8c7dc] hover:bg-[#6e8ebc]"}`} />)}</div>
+            <button type="button" onClick={previous} aria-label="Previous slide" className="grid size-7 place-items-center rounded-full border border-[#d7e1ef] bg-white text-[#334560] hover:text-[#2563eb]"><ArrowLeft size={12} /></button>
+            <button type="button" onClick={next} aria-label="Next slide" className="grid size-7 place-items-center rounded-full border border-[#d7e1ef] bg-white text-[#334560] hover:text-[#2563eb]"><ArrowRight size={12} /></button>
+            <button type="button" onClick={() => setPaused((value) => !value)} aria-label={paused ? "Resume slide autoplay" : "Pause slide autoplay"} className="grid size-7 place-items-center rounded-full border border-[#d7e1ef] bg-white text-[#334560] hover:text-[#2563eb]">{paused ? <Play size={11} /> : <Pause size={11} />}</button>
+          </>}
+        </div>
+      </div>
+    </Container>
+  </section>;
 }

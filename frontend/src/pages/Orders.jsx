@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 import OrderCard from "../components/Orders/OrderCard";
 import EmptyState from "../components/Common/EmptyState";
 
@@ -31,9 +32,9 @@ export default function Orders() {
   }, [orders, user]);
 
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
       <PageHeading eyebrow="YOUR ACCOUNT" title="My orders">
-        <p>Review your order history and track live shipment statuses.</p>
+        <p>Review your order history and current order statuses.</p>
       </PageHeading>
 
       {customerOrders.length ? (
@@ -45,11 +46,11 @@ export default function Orders() {
       ) : (
         <EmptyState
           title="No orders yet"
-          message="Your placed orders and parcel tracking updates will appear here."
+          message="Your placed orders will appear here. Live courier tracking requires store integration."
           action="Start shopping"
           to="/products"
         />
       )}
-    </main>
+    </Container>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 import { notify } from "../components/Common/Toast";
 
 export default function Contact() {
@@ -19,11 +20,11 @@ export default function Contact() {
     });
     e.currentTarget.reset();
     setSent(true);
-    notify("Thank you! Your message has been sent to our team.");
+    notify("Message saved in this browser demo. No email was sent.");
   };
 
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
       <PageHeading eyebrow="WE’RE HERE TO HELP" title="Get in touch">
         <p>
           Questions about an item or order? Send us a message and our team will
@@ -124,13 +125,12 @@ export default function Contact() {
             Send message <ArrowRight size={15} />
           </button>
           {sent && (
-            <p className="rounded-lg bg-[#e9f8ed] p-3 text-xs font-semibold text-[#16803b]">
-              Thank you! Your message has been received. Our team will get back
-              to you shortly.
+            <p className="rounded-lg bg-[#eaf1ff] p-3 text-xs font-semibold text-[#1d4ed8]" role="status">
+              Message saved in this browser demo. It was not sent to the store.
             </p>
           )}
         </form>
       </div>
-    </main>
+    </Container>
   );
 }

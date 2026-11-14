@@ -1,126 +1,45 @@
 import { useState } from "react";
-import { ArrowRight, Tag, Copy, Check, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Check, Copy, Tag } from "lucide-react";
 import { Link } from "react-router";
+import { useStore } from "../../context/StoreContext";
 import { PRIMARY_OFFER } from "../../constants/offers";
+import { getMobileAccessories } from "../../utils/homeCatalog";
+
+const money = (value) => `Rs. ${Number(value || 0).toLocaleString("en-PK")}`;
 
 export default function PromoBanner() {
+  const { products = [], coupons = [] } = useStore();
   const [copied, setCopied] = useState(false);
+  const coupon = coupons.find((item) => item.code === PRIMARY_OFFER.code && item.active) || coupons.find((item) => item.active);
+  const accessoryProducts = getMobileAccessories(products).filter((product) => product.image);
+  const featured = accessoryProducts.find((product) => /earbud|headphone|charger|powercore/i.test(product.name || "")) || accessoryProducts[0];
+  const offerLabel = coupon ? coupon.type === "percent" ? `${Number(coupon.value)}% OFF orders over ${money(coupon.minimumOrder)}` : `${money(coupon.value)} OFF orders over ${money(coupon.minimumOrder)}` : "Explore this season's collection";
 
-  const handleCopy = async () => {
+  const copyCode = async () => {
+    if (!coupon?.code) return;
     try {
-      await navigator.clipboard.writeText(PRIMARY_OFFER.code);
+      await navigator.clipboard.writeText(coupon.code);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      window.setTimeout(() => setCopied(false), 2200);
     } catch {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopied(false);
     }
   };
 
-  return (
-    <section
-      aria-label="Promotional campaign"
-      className="relative mx-auto mb-[75px] flex min-h-[310px] max-w-[1120px] items-center justify-between overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-[#0c2352] via-[#15366e] to-[#0a1c40] px-8 py-10 text-white shadow-[0_20px_50px_rgba(16,36,73,0.14)] sm:px-12 sm:py-12 max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-[52px] max-[600px]:p-6"
-    >
-      {/* Decorative ambient background glows */}
-      <div className="pointer-events-none absolute -left-16 -top-16 size-64 rounded-full bg-blue-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-16 right-16 size-64 rounded-full bg-sky-400/20 blur-3xl" />
-
-      {/* Left copy & CTA content */}
-      <div className="relative z-10 max-w-[540px]">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1 text-xs font-extrabold tracking-[.14em] text-[#a9c6ff] backdrop-blur-md">
-          <Sparkles size={13} className="text-[#60a5fa]" />
-          <span>SPECIAL PROMOTIONAL OFFER</span>
-        </div>
-
-        <h2 className="my-3 text-3xl font-extrabold leading-tight tracking-[-0.04em] text-white sm:text-4xl max-[600px]:text-2xl">
-          Upgrade your everyday setup.
-        </h2>
-
-        <p className="text-xs leading-relaxed text-[#d1ddf4] sm:text-sm">
-          Discover handpicked audio, wearables and creator essentials with
-          verified brand warranty and express nationwide delivery.
-        </p>
-
-        {/* Real Coupon Callout with 1-Click Copy */}
-        <div className="my-5 flex flex-wrap items-center gap-3">
-          <div className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">
-            <Tag size={14} className="text-[#a9c6ff]" />
-            <span className="text-xs font-medium text-[#d1ddf4]">
-              Use code:
-            </span>
-            <code className="font-mono text-xs font-extrabold tracking-wider text-white">
-              {PRIMARY_OFFER.code}
-            </code>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="ml-1 inline-flex cursor-pointer items-center gap-1 rounded-lg bg-white/20 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-white hover:text-[#0c2352] active:scale-95"
-              aria-label="Copy coupon code"
-            >
-              {copied ? (
-                <>
-                  <Check size={12} className="text-[#4ade80]" />
-                  <span>Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy size={12} />
-                  <span>Copy</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          <span className="text-xs font-semibold text-[#a9c6ff]">
-            {PRIMARY_OFFER.fullOfferText}
-          </span>
-        </div>
-
-        <Link
-          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-xs font-bold text-[#0c2352] shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#f1f5fc] hover:shadow-lg active:scale-98"
-          to="/products"
-        >
-          <span>Explore Collection</span>
-          <ArrowRight size={15} />
-        </Link>
+  return <section aria-labelledby="home-promo-heading" className="relative isolate overflow-hidden rounded-[26px] bg-[#102449] text-white shadow-[0_18px_40px_-28px_rgba(15,35,71,.65)] sm:rounded-[30px]">
+    <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_83%_48%,rgba(42,111,214,.56),transparent_35%),linear-gradient(110deg,#102449,#173e78)]" />
+    {featured?.image && <img src={featured.image} alt="" loading="lazy" decoding="async" className="absolute inset-y-0 right-0 -z-10 h-full w-[48%] object-cover opacity-45 mix-blend-luminosity sm:w-[43%]" />}
+    <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#102449] via-[#102449]/95 to-transparent" />
+    <div className="grid min-h-[245px] items-center gap-4 px-5 py-7 sm:min-h-[270px] sm:px-8 lg:min-h-[290px] lg:grid-cols-[1.15fr_.85fr] lg:px-10">
+      <div className="max-w-[600px]">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.15em] text-blue-100"><Tag size={12} /> Special promotional offer</span>
+        <h2 id="home-promo-heading" className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">Power your day, wherever it takes you.</h2>
+        <p className="mt-2 max-w-lg text-xs leading-5 text-blue-100/80 sm:text-sm">Explore earbuds, chargers and everyday mobile accessories from the current collection.</p>
+        {coupon && <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-[10px] text-blue-100"><button type="button" onClick={copyCode} className="inline-flex min-h-8 items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-2.5 font-medium text-white hover:bg-white/15"><span>Use code:</span><strong className="font-mono tracking-[.1em]">{coupon.code}</strong>{copied ? <Check size={12} /> : <Copy size={12} />}</button><span>{offerLabel}</span></div>}
+        <Link to="/products?collection=mobile-accessories" className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-lg bg-white px-4 text-xs font-bold text-[#102449] transition hover:bg-blue-50">Explore accessories <ArrowRight size={14} /></Link>
       </div>
-
-      {/* Right side: Modern High-Res Product Cutout Showcase */}
-      <div className="relative hidden w-[42%] items-center justify-center lg:flex">
-        {/* Soft radial aura */}
-        <div className="pointer-events-none absolute size-56 rounded-full bg-blue-400/25 blur-3xl" />
-
-        {/* Main Headphones Card */}
-        <div className="relative z-10 -rotate-6 transition-all duration-300 hover:rotate-0 hover:scale-105">
-          <img
-            src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&h=600&q=85"
-            alt="Noise Canceling Headphones"
-            width="192"
-            height="192"
-            loading="lazy"
-            decoding="async"
-            className="size-48 rounded-2xl object-cover shadow-[0_25px_40px_rgba(0,0,0,0.38)] ring-1 ring-white/20"
-          />
-          <div className="absolute -bottom-3 -right-3 flex items-center gap-1.5 rounded-xl border border-white/40 bg-white/95 px-3 py-1.5 text-xs font-bold text-[#17233b] shadow-md backdrop-blur-md">
-            <Star size={13} className="text-[#f5a623] fill-[#f5a623]" />
-            <span>4.9 · Premium Sound</span>
-          </div>
-        </div>
-
-        {/* Floating Accent Earbuds Card */}
-        <div className="absolute -bottom-3 right-4 z-20 rotate-12 transition-all duration-300 hover:rotate-6 hover:scale-105">
-          <img
-            src="https://images.unsplash.com/photo-1733556046403-2d090cf359a3?auto=format&fit=crop&w=400&h=400&q=85"
-            alt="AirPods Pro 2"
-            width="112"
-            height="112"
-            loading="lazy"
-            decoding="async"
-            className="size-28 rounded-2xl object-cover shadow-[0_20px_30px_rgba(0,0,0,0.38)] ring-1 ring-white/20"
-          />
-        </div>
-      </div>
-    </section>
-  );
+      {featured && <div className="relative flex h-[150px] items-center justify-center lg:h-full lg:min-h-[190px]"><div className="absolute size-32 rotate-[-7deg] rounded-[24px] bg-[#ffc928] shadow-[0_22px_38px_-20px_rgba(0,0,0,.55)] sm:size-36 lg:size-40" /><img src={featured.image} alt={featured.name} loading="lazy" decoding="async" className="relative z-10 max-h-[145px] max-w-[78%] object-contain drop-shadow-[0_20px_22px_rgba(0,0,0,.4)] lg:max-h-[210px] lg:max-w-[85%]" /><span className="absolute bottom-0 right-0 rounded-full bg-white px-3 py-1.5 text-[10px] font-semibold text-[#102449] shadow-lg lg:bottom-5 lg:right-1">{featured.name}</span></div>}
+    </div>
+    <p role="status" className="sr-only">{copied ? "Offer code copied." : ""}</p>
+  </section>;
 }

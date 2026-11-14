@@ -1,232 +1,347 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Smartphone,
-  Headphones,
-  Laptop,
-  Watch,
-  Gamepad2,
-  Cable,
-  Tag,
+  ArrowLeft,
   ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Play,
-  Pause,
-  Sparkles,
+  BatteryCharging,
+  Cable,
+  Headphones,
+  ShieldCheck,
+  Smartphone,
+  Speaker,
+  TabletSmartphone,
+  Watch,
+  Zap,
 } from "lucide-react";
+import { Link } from "react-router";
 import { useStore } from "../../context/StoreContext";
+import { isMobileAccessory } from "../../utils/homeCatalog";
+import Reveal from "../Common/Reveal";
 
-const categoryIcons = {
-  phones: Smartphone,
-  audio: Headphones,
-  laptops: Laptop,
-  wearables: Watch,
-  gaming: Gamepad2,
-  accessories: Cable,
-};
+const GAP = 16; // gap-4
+const SPEED = 36; // px per second
+
+const categoryCards = [
+  {
+    label: "Earbuds & audio",
+    icon: Headphones,
+    matches: (product) => product.category === "Audio",
+    imagePattern: /earbud|airpods|earphone|headphone|speaker/i,
+    query: "category=Audio",
+  },
+  {
+    label: "Chargers",
+    icon: Zap,
+    matches: (product) =>
+      product.category === "Accessories" && /charg/i.test(product.name || ""),
+    imagePattern: /charg|adapter/i,
+    query: "category=Accessories&search=charg",
+  },
+  {
+    label: "USB accessories",
+    icon: Cable,
+    matches: (product) =>
+      product.category === "Accessories" && /usb/i.test(product.name || ""),
+    imagePattern: /usb|cable/i,
+    query: "category=Accessories&search=usb",
+  },
+  {
+    label: "Power banks",
+    icon: BatteryCharging,
+    matches: (product) =>
+      product.category === "Accessories" && /power/i.test(product.name || ""),
+    imagePattern: /powercore|powerbank|power bank/i,
+    query: "category=Accessories&search=power",
+  },
+  {
+    label: "Smart watches & wearables",
+    icon: Watch,
+    matches: (product) => product.category === "Wearables",
+    imagePattern: /watch|wearable|fitness/i,
+    query: "category=Wearables",
+  },
+  {
+    label: "Phone cases",
+    icon: TabletSmartphone,
+    matches: (product) =>
+      product.category === "Accessories" &&
+      /case|cover|pouch/i.test(product.name || ""),
+    imagePattern: /case|cover|pouch/i,
+    query: "category=Accessories&search=case",
+  },
+  {
+    label: "Screen protectors",
+    icon: ShieldCheck,
+    matches: (product) =>
+      product.category === "Accessories" &&
+      /screen|protector|glass|tempered/i.test(product.name || ""),
+    imagePattern: /screen|protector|glass|tempered/i,
+    query: "category=Accessories&search=screen",
+  },
+  {
+    label: "Speakers",
+    icon: Speaker,
+    matches: (product) =>
+      product.category === "Audio" &&
+      /speaker|soundbar|boom/i.test(product.name || ""),
+    imagePattern: /speaker|soundbar|boom/i,
+    query: "category=Audio&search=speaker",
+  },
+  {
+    label: "Mobile accessories",
+    icon: Smartphone,
+    matches: isMobileAccessory,
+    query: "collection=mobile-accessories",
+  },
+];
+
+function optimizedThumbnail(image) {
+  try {
+    const url = new URL(image);
+    if (url.hostname === "images.unsplash.com") {
+      url.searchParams.set("auto", "format");
+      url.searchParams.set("fit", "crop");
+      url.searchParams.set("w", "320");
+      url.searchParams.set("h", "320");
+      url.searchParams.set("q", "75");
+    }
+    return url.href;
+  } catch {
+    return image;
+  }
+}
+
+function CategoryVisual({ image, Icon }) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <span className="grid size-full place-items-center text-[#2563eb]">
+      {image && !failed ? (
+        <img
+          src={optimizedThumbnail(image)}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          onError={() => setFailed(true)}
+          className="size-full rounded-full object-contain p-3 transition-transform duration-500 group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        />
+      ) : (
+        <Icon size={34} aria-hidden="true" />
+      )}
+    </span>
+  );
+}
+
+function CategoryCard({ item, clone = false }) {
+  const { label, icon, query, image } = item;
+
+  return (
+    <Link
+      to={`/products?${query}`}
+      data-category-card
+      data-clone={clone ? "true" : undefined}
+      aria-hidden={clone || undefined}
+      tabIndex={clone ? -1 : undefined}
+      className="group flex w-full flex-col items-center gap-2.5 focus-visible:outline-none"
+    >
+      <span className="relative block aspect-square w-full overflow-hidden rounded-full bg-[#f3f5f8] p-[7px] ring-2 ring-transparent transition-all duration-300 group-hover:-translate-y-1 group-hover:bg-[#edf1f6] group-hover:ring-[#2563eb]/40 group-hover:shadow-[0_12px_28px_-14px_rgba(37,99,235,.5)] group-focus-visible:ring-brand/60 motion-reduce:transition-none">
+        <CategoryVisual key={image || label} image={image} Icon={icon} />
+      </span>
+      <span className="line-clamp-2 w-full text-center text-xs font-bold leading-4 text-[#102449] transition-colors group-hover:text-[#2563eb] sm:text-sm">
+        {label}
+      </span>
+    </Link>
+  );
+}
+
+// 2px smaller than before at every breakpoint
+const cardWidth =
+  "w-[102px] shrink-0 sm:w-[122px] md:w-[138px] lg:w-[158px]";
 
 export default function CategoryGrid() {
-  const { categories = [], products = [] } = useStore();
-  const railRef = useRef(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const isInteractingRef = useRef(false);
-  const pauseTimeoutRef = useRef(null);
+  const { products = [] } = useStore();
+  const rail = useRef(null);
+  const setWidth = useRef(0); // width of ONE set of cards (incl. trailing gap)
+  const [hasOverflow, setHasOverflow] = useState(false);
+  const [autoScrollPaused, setAutoScrollPaused] = useState(false);
 
-  // Fallback if categories is empty
-  const baseCategories =
-    categories.length > 0
-      ? categories
-      : ["Phones", "Audio", "Laptops", "Wearables", "Gaming", "Accessories"];
+  const items = useMemo(
+    () =>
+      categoryCards
+        .map((card) => {
+          const matchingProducts = products.filter(card.matches);
+          const imageProduct =
+            matchingProducts.find(
+              (product) =>
+                product.image && card.imagePattern?.test(product.name || ""),
+            ) || matchingProducts.find((product) => product.image);
 
-  // Duplicate categories to create a seamless infinite loop
-  const sliderItems = [...baseCategories, ...baseCategories];
+          return {
+            ...card,
+            count: matchingProducts.length,
+            image: imageProduct?.image || "",
+          };
+        })
+        .filter((card) => card.count > 0),
+    [products],
+  );
 
-  // Silky-smooth auto-scroll animation via requestAnimationFrame
+  const scroll = (direction) => {
+    const element = rail.current;
+    if (!element) return;
+    const card = element.querySelector("[data-category-card]");
+    const step = (card?.getBoundingClientRect().width || 138) + GAP;
+    element.scrollBy({ left: direction * step, behavior: "smooth" });
+  };
+
+  // Measure one set of cards to know if the rail overflows
   useEffect(() => {
-    let animationFrameId;
-    let lastTime = performance.now();
+    const element = rail.current;
+    if (!element) return undefined;
 
-    const step = (time) => {
-      const delta = (time - lastTime) / 1000;
-      lastTime = time;
-
-      const rail = railRef.current;
-      const shouldScroll =
-        !isHovered &&
-        !isPaused &&
-        !isInteractingRef.current &&
-        typeof window !== "undefined" &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      if (shouldScroll && rail) {
-        // Calm, premium speed (32 pixels per second)
-        rail.scrollLeft += 32 * delta;
-
-        // Reset scroll position seamlessly at the exact halfway point
-        const halfWidth = rail.scrollWidth / 2;
-        if (halfWidth > 0 && rail.scrollLeft >= halfWidth) {
-          rail.scrollLeft -= halfWidth;
-        }
+    const measure = () => {
+      const originals = element.querySelectorAll(
+        "[data-category-card]:not([data-clone])",
+      );
+      if (!originals.length) {
+        setWidth.current = 0;
+        setHasOverflow(false);
+        return;
       }
-
-      animationFrameId = requestAnimationFrame(step);
+      const first = originals[0].getBoundingClientRect();
+      const last = originals[originals.length - 1].getBoundingClientRect();
+      const width = last.right - first.left + GAP;
+      setWidth.current = width;
+      setHasOverflow(width - GAP > element.clientWidth + 1);
     };
 
-    animationFrameId = requestAnimationFrame(step);
-
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    window.addEventListener("resize", measure);
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
     };
-  }, [isHovered, isPaused]);
+  }, [items.length]);
 
-  // Smooth manual left/right step navigation
-  const handleScroll = (direction) => {
-    if (!railRef.current) return;
-    isInteractingRef.current = true;
-    const distance = 240;
+  // Continuous, seamless auto scroll
+  useEffect(() => {
+    const element = rail.current;
+    if (
+      !element ||
+      !hasOverflow ||
+      autoScrollPaused ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
 
-    railRef.current.scrollBy({
-      left: direction === "left" ? -distance : distance,
-      behavior: "smooth",
-    });
+    let frame = 0;
+    let last = performance.now();
+    let position = element.scrollLeft;
 
-    clearTimeout(pauseTimeoutRef.current);
-    pauseTimeoutRef.current = setTimeout(() => {
-      isInteractingRef.current = false;
-    }, 2800);
+    const tick = (now) => {
+      const delta = Math.min(now - last, 64);
+      last = now;
+      position += (SPEED * delta) / 1000;
+      const loopAt = setWidth.current;
+      if (loopAt > 0 && position >= loopAt) position -= loopAt;
+      element.scrollLeft = position;
+      frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [autoScrollPaused, hasOverflow, items.length]);
+
+  // Keep manual scrolling inside the looped range
+  const handleScroll = () => {
+    const element = rail.current;
+    const loopAt = setWidth.current;
+    if (!element || !hasOverflow || !loopAt) return;
+    if (element.scrollLeft >= loopAt) element.scrollLeft -= loopAt;
+    else if (element.scrollLeft <= 0) element.scrollLeft += loopAt;
   };
 
   return (
     <section
-      id="categories"
-      aria-label="Shop by category"
-      className="mx-auto mb-12 sm:mb-14 max-w-[1120px] max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-10"
+      id="home-categories"
+      aria-labelledby="home-categories-heading"
+      className="scroll-mt-28"
     >
-      {/* Compact Section Header */}
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div className="mb-4 flex items-end justify-between gap-3">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-extrabold tracking-[.14em] text-[#2563eb]">
-            <Sparkles size={12} className="text-[#2563eb]" />
-            <span>EXPLORE BY CATEGORY</span>
-          </div>
-          <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-[#071a3d]">
+          <p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#2563eb]">
+            ✦ &nbsp;Explore by category
+          </p>
+          <h2
+            id="home-categories-heading"
+            className="mt-1 text-xl font-semibold tracking-tight text-[#102449] sm:text-2xl"
+          >
             Shop by category
           </h2>
         </div>
-
-        {/* Navigation & Controls */}
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => handleScroll("left")}
-            className="grid size-8 cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-white text-[#25416c] shadow-2xs transition-all duration-150 hover:border-[#2563eb] hover:bg-[#2563eb] hover:text-white active:scale-95"
-            aria-label="Previous categories"
-            title="Scroll left"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => handleScroll("right")}
-            className="grid size-8 cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-white text-[#25416c] shadow-2xs transition-all duration-150 hover:border-[#2563eb] hover:bg-[#2563eb] hover:text-white active:scale-95"
-            aria-label="Next categories"
-            title="Scroll right"
-          >
-            <ChevronRight size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsPaused((prev) => !prev)}
-            className="grid size-8 cursor-pointer place-items-center rounded-full border border-[#dfe6f0] bg-white text-[#25416c] shadow-2xs transition-all duration-150 hover:border-[#2563eb] hover:bg-[#eff4ff] hover:text-[#2563eb] active:scale-95"
-            aria-label={isPaused ? "Play auto slider" : "Pause auto slider"}
-            title={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
-          >
-            {isPaused ? <Play size={13} className="ml-0.5" /> : <Pause size={13} />}
-          </button>
-          <Link
-            className="ml-2 hidden sm:inline-flex shrink-0 cursor-pointer items-center gap-1 text-xs font-bold text-[#2563eb] transition hover:text-[#174a93]"
-            to="/products"
-          >
-            <span>All products</span>
-            <ArrowRight size={13} />
-          </Link>
+        <div className="flex items-center gap-2">
+          {hasOverflow && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => scroll(-1)}
+                aria-label="Scroll categories left"
+                className="grid size-8 place-items-center rounded-full border border-[#dce5f3] bg-white text-[#52617a] hover:border-[#2563eb] hover:text-[#2563eb]"
+              >
+                <ArrowLeft size={15} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scroll(1)}
+                aria-label="Scroll categories right"
+                className="grid size-8 place-items-center rounded-full border border-[#dce5f3] bg-white text-[#52617a] hover:border-[#2563eb] hover:text-[#2563eb]"
+              >
+                <ArrowRight size={15} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Slider Viewport with Ambient Edge Fade Masks */}
       <div
-        className="relative overflow-hidden rounded-xl"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onTouchStart={() => {
-          isInteractingRef.current = true;
+        ref={rail}
+        onScroll={handleScroll}
+        className="no-scrollbar flex gap-4 overflow-x-auto px-2 pb-5 pt-3"
+        aria-label="Mobile accessory categories"
+        onMouseEnter={() => setAutoScrollPaused(true)}
+        onMouseLeave={() => setAutoScrollPaused(false)}
+        onFocus={() => setAutoScrollPaused(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setAutoScrollPaused(false);
+          }
         }}
-        onTouchEnd={() => {
-          clearTimeout(pauseTimeoutRef.current);
-          pauseTimeoutRef.current = setTimeout(() => {
-            isInteractingRef.current = false;
-          }, 2400);
-        }}
+        onPointerDown={() => setAutoScrollPaused(true)}
+        onPointerUp={() => setAutoScrollPaused(false)}
+        onPointerCancel={() => setAutoScrollPaused(false)}
       >
-        {/* Left edge fade gradient mask */}
-        <div
-          className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-8 sm:w-14 bg-gradient-to-r from-[#f5f8fd] to-transparent"
-          aria-hidden="true"
-        />
+        {items.map((item, index) => (
+          <Reveal as="div" index={index} key={item.label} className={cardWidth}>
+            <CategoryCard item={item} />
+          </Reveal>
+        ))}
 
-        {/* Right edge fade gradient mask */}
-        <div
-          className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-8 sm:w-14 bg-gradient-to-l from-[#f5f8fd] to-transparent"
-          aria-hidden="true"
-        />
+        {/* Duplicate set for seamless infinite loop (only when overflowing) */}
+        {hasOverflow &&
+          items.map((item) => (
+            <div key={`clone-${item.label}`} className={cardWidth}>
+              <CategoryCard item={item} clone />
+            </div>
+          ))}
 
-        {/* Scrolling Track */}
-        <div
-          ref={railRef}
-          role="region"
-          aria-label="Category Carousel"
-          className="flex gap-3 overflow-x-auto py-1 px-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {sliderItems.map((catName, index) => {
-            const key = String(catName || "").toLowerCase();
-            const Icon = categoryIcons[key] || Tag;
-
-            const productCount = products.filter(
-              (p) => (p.category || "").toLowerCase() === key,
-            ).length;
-
-            return (
-              <Link
-                key={`${catName}-${index}`}
-                to={`/products?category=${encodeURIComponent(catName)}`}
-                className="group relative flex w-[205px] sm:w-[230px] shrink-0 items-center gap-3 rounded-xl border border-[#e2e8f0] bg-white p-3 shadow-[0_2px_8px_rgba(15,23,42,0.02)] transition-all duration-200 hover:-translate-y-1 hover:border-[#2563eb]/50 hover:bg-white hover:shadow-[0_8px_20px_rgba(37,99,235,0.08)] active:scale-98"
-              >
-                {/* Icon Container */}
-                <div className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#eff4ff] text-[#2563eb] transition-all duration-200 group-hover:scale-105 group-hover:bg-[#2563eb] group-hover:text-white">
-                  <Icon size={20} />
-                </div>
-
-                {/* Category Info */}
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-sm font-bold text-[#071a3d] transition-colors group-hover:text-[#2563eb]">
-                    {catName}
-                  </h3>
-                  <span className="block truncate text-xs text-[#71809a]">
-                    {productCount} {productCount === 1 ? "item" : "items"}
-                  </span>
-                </div>
-
-                {/* Subtle right arrow */}
-                <ArrowRight
-                  size={14}
-                  className="shrink-0 text-[#94a3b8] transition-all duration-200 group-hover:translate-x-1 group-hover:text-[#2563eb]"
-                />
-              </Link>
-            );
-          })}
-        </div>
+        {!items.length && (
+          <p className="rounded-xl border border-dashed border-[#dbe3ef] px-4 py-5 text-xs text-[#64748b]">
+            Mobile accessory categories will appear as products are added.
+          </p>
+        )}
       </div>
     </section>
   );

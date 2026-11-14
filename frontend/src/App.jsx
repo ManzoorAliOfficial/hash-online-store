@@ -1,4 +1,4 @@
-import { lazy, Suspense, useLayoutEffect } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect } from "react";
 import { Routes, Route, useLocation } from "react-router";
 import { StoreProvider } from "./context/StoreContext";
 import StoreLayout from "./layouts/StoreLayout";
@@ -66,10 +66,58 @@ function ScrollToTop() {
   return null;
 }
 
+const pageTitles = {
+  "/": "Home",
+  "/products": "Shop",
+  "/cart": "Shopping Cart",
+  "/checkout": "Checkout",
+  "/wishlist": "Wishlist",
+  "/orders": "My Orders",
+  "/profile": "My Account",
+  "/login": "Sign In",
+  "/register": "Create Account",
+  "/forgot-password": "Reset Password",
+  "/contact": "Contact Us",
+  "/about": "About Us",
+  "/terms": "Terms & Conditions",
+  "/admin": "Admin Dashboard",
+  "/admin/products": "Manage Products",
+  "/admin/categories": "Manage Categories",
+  "/admin/orders": "Manage Orders",
+  "/admin/customers": "Manage Customers",
+  "/admin/couriers": "Manage Couriers",
+  "/admin/inventory": "Inventory",
+  "/admin/reviews": "Manage Reviews",
+  "/admin/coupons": "Manage Coupons",
+  "/admin/reports": "Reports",
+  "/admin/settings": "Store Settings",
+  "/admin/messages": "Customer Messages",
+};
+
+function PageMetadata() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const pageTitle =
+      pageTitles[pathname] ||
+      (pathname.startsWith("/products/") ? "Product Details" :
+        pathname.startsWith("/orders/") ? "Order Details" : "Page Not Found");
+    document.title = `${pageTitle} | Hash Online Store`;
+
+    const description = document.querySelector('meta[name="description"]');
+    if (description) {
+      description.content = `${pageTitle} at Hash Online Store. Shop genuine tech and gadgets in Pakistan.`;
+    }
+  }, [pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <StoreProvider>
       <ScrollToTop />
+      <PageMetadata />
       <Suspense
         fallback={
           <div className="flex min-h-[60vh] items-center justify-center p-8">

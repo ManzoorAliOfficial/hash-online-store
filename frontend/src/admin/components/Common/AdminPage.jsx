@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import {
   ArrowRight,
@@ -97,6 +97,8 @@ function ProductForm({ product, categories, onSave, onClose }) {
       stock: Number(data.stock),
       rating: Number(data.rating || 0),
       reviews: Number(data.reviews || 0),
+      trending: data.trending === "on",
+      offerEndsAt: data.offerEndsAt || "",
     });
   };
   return (
@@ -136,6 +138,12 @@ function ProductForm({ product, categories, onSave, onClose }) {
           value={product?.oldPrice}
         />
         <Field
+          label="Offer ends at (optional)"
+          name="offerEndsAt"
+          type="datetime-local"
+          value={product?.offerEndsAt?.slice?.(0, 16)}
+        />
+        <Field
           label="Stock quantity"
           name="stock"
           type="number"
@@ -143,6 +151,15 @@ function ProductForm({ product, categories, onSave, onClose }) {
           value={product?.stock ?? 0}
           required
         />
+        <label className="flex min-h-10 items-center gap-2 text-xs font-semibold text-[#34445f]">
+          <input
+            type="checkbox"
+            name="trending"
+            defaultChecked={Boolean(product?.trending || product?.isTrending)}
+            className="size-4 accent-[#2563eb]"
+          />
+          Mark as trending
+        </label>
         <label className="grid gap-1.5 text-xs font-semibold text-[#34445f]">
           Icon
           <select
@@ -307,7 +324,9 @@ function AdminPageContent({ page = "Dashboard" }) {
   } = store;
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const normalized = query.trim().toLowerCase();
+  useEffect(() => setCurrentPage(1), [normalized]);
   const matches = (value) =>
     JSON.stringify(value).toLowerCase().includes(normalized);
   const notice = (message) => notify(message);
@@ -792,6 +811,12 @@ function AdminPageContent({ page = "Dashboard" }) {
       </section>
     );
 
+  const pageSize = 10;
+  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+  const activePage = Math.min(currentPage, pageCount);
+  const firstVisible = rows.length ? (activePage - 1) * pageSize + 1 : 0;
+  const visibleRows = rows.slice(firstVisible - 1, activePage * pageSize);
+
   const isProduct = modal?.type === "product";
   const isCategory = modal?.type === "category";
   const isCoupon = modal?.type === "coupon";
@@ -851,7 +876,38 @@ function AdminPageContent({ page = "Dashboard" }) {
             />
           </label>
         </header>
-        <DataTable columns={columns} rows={rows} actions={actions} />
+        <DataTable columns={columns} rows={visibleRows} actions={actions} />
+        {pageCount > 1 && (
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#edf0f5] pt-4 max-[500px]:flex-col max-[500px]:items-stretch">
+            <p className="text-xs text-[#71809a]" aria-live="polite">
+              Showing {firstVisible}–{Math.min(activePage * pageSize, rows.length)} of {rows.length}
+            </p>
+            <nav
+              className="flex items-center justify-end gap-2 max-[500px]:justify-between"
+              aria-label={`${title} pages`}
+            >
+              <button
+                type="button"
+                className="min-h-9 rounded-lg border border-[#dce5f3] px-3 text-xs font-semibold text-[#52617a] hover:bg-[#f4f7fc] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => setCurrentPage(activePage - 1)}
+                disabled={activePage <= 1}
+              >
+                Previous
+              </button>
+              <span className="min-w-20 text-center text-xs font-semibold text-[#52617a]" aria-current="page">
+                Page {activePage} of {pageCount}
+              </span>
+              <button
+                type="button"
+                className="min-h-9 rounded-lg border border-[#dce5f3] px-3 text-xs font-semibold text-[#52617a] hover:bg-[#f4f7fc] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => setCurrentPage(activePage + 1)}
+                disabled={activePage >= pageCount}
+              >
+                Next
+              </button>
+            </nav>
+          </div>
+        )}
       </section>
       <Modal
         open={isProduct}

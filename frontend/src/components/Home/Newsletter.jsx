@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, Mail, Gift, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Gift, Mail } from "lucide-react";
 import { useStore } from "../../context/StoreContext";
 import { PRIMARY_OFFER } from "../../constants/offers";
 
@@ -7,81 +7,18 @@ export default function Newsletter() {
   const { subscribe } = useStore();
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
-
   const submit = (event) => {
     event.preventDefault();
     const email = new FormData(event.currentTarget).get("email");
-    if (subscribe(email)) {
-      setMessage(PRIMARY_OFFER.successMessage);
-      setSuccess(true);
-      event.currentTarget.reset();
-    } else {
-      setMessage("Please enter a valid email address.");
-      setSuccess(false);
-    }
+    const saved = subscribe(email);
+    setSuccess(saved);
+    setMessage(saved ? "Thanks — your email is saved for this store demo." : "Please enter a valid email address.");
+    if (saved) event.currentTarget.reset();
   };
-
-  return (
-    <section
-      aria-label="Newsletter sign up"
-      className="mx-auto mb-[75px] max-w-[1120px] rounded-3xl border border-white/10 bg-gradient-to-br from-[#0c1f44] via-[#102449] to-[#0a1835] px-8 py-10 text-white shadow-[0_16px_40px_rgba(16,36,73,0.12)] sm:px-12 sm:py-12 max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-[52px] max-[600px]:p-6"
-    >
-      <div className="grid grid-cols-[1.2fr_1fr] items-center gap-8 max-[850px]:grid-cols-1 max-[850px]:gap-6">
-        <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-extrabold tracking-[.14em] text-[#a9c6ff]">
-            <Gift size={13} className="text-[#60a5fa]" />
-            <span>WELCOME REWARD</span>
-          </div>
-          {/* Changed h3 to h2 */}
-          <h2 className="mt-3 text-2xl font-extrabold tracking-[-.04em] text-white sm:text-3xl max-[600px]:text-xl">
-            {PRIMARY_OFFER.headline}
-          </h2>
-          <p className="mt-2 text-xs leading-relaxed text-[#c6d5ee] sm:text-sm">
-            Subscribe to our newsletter for exclusive weekly product drops,
-            secret flash sales, and verified tech guides across Pakistan.
-          </p>
-        </div>
-
-        <div>
-          <form
-            className="flex flex-col gap-2.5 sm:flex-row"
-            onSubmit={submit}
-          >
-            <div className="relative flex-1">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#8491a5]">
-                <Mail size={16} />
-              </div>
-              <input
-                className="h-12 w-full rounded-xl border border-white/20 bg-white/95 pl-10 pr-4 text-xs font-medium text-[#17233b] placeholder:text-[#8491a5] outline-none transition focus:border-[#7dafff] focus:bg-white focus:ring-4 focus:ring-[#7dafff]/30"
-                name="email"
-                type="email"
-                required
-                placeholder="Enter your email address"
-                aria-label="Email address"
-              />
-            </div>
-            <button
-              type="submit"
-              className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-6 text-xs font-bold text-white shadow-md shadow-[#2563eb]/20 transition hover:bg-[#174a93] active:scale-98"
-            >
-              <span>Subscribe</span>
-              <ArrowRight size={15} />
-            </button>
-          </form>
-
-          {message && (
-            <div
-              className={`mt-3 flex items-center gap-2 text-xs font-semibold ${
-                success ? "text-[#86efac]" : "text-[#fca5a5]"
-              }`}
-              role="status"
-            >
-              {success && <CheckCircle2 size={15} className="shrink-0" />}
-              <span>{message}</span>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  );
+  return <section aria-labelledby="home-newsletter-heading" className="rounded-[24px] border border-white/10 bg-gradient-to-br from-[#102449] via-[#0e2144] to-[#091832] px-5 py-7 text-white shadow-[0_18px_44px_-30px_rgba(15,35,71,.7)] sm:rounded-[28px] sm:px-8 sm:py-9 lg:px-10">
+    <div className="grid items-center gap-6 lg:grid-cols-[1fr_1.05fr] lg:gap-12">
+      <div><span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.15em] text-blue-100"><Gift size={12} /> Welcome reward</span><h2 id="home-newsletter-heading" className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">{PRIMARY_OFFER.headline}*</h2><p className="mt-2 max-w-lg text-xs leading-5 text-blue-100/75">Subscribe for product updates and store offers. *Offer terms apply.</p></div>
+      <div><form onSubmit={submit} className="flex flex-col gap-2.5 sm:flex-row"><label className="flex min-h-11 min-w-0 flex-1 items-center gap-2.5 rounded-lg border border-white/15 bg-white px-3.5 text-[#64748b] focus-within:ring-2 focus-within:ring-blue-300"><span className="sr-only">Email address</span><Mail size={15} className="shrink-0" /><input name="email" type="email" autoComplete="email" required placeholder="Enter your email address" className="min-w-0 flex-1 bg-transparent text-xs text-[#17233b] outline-none placeholder:text-[#8491a5]" /></label><button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[#2563eb] px-5 text-xs font-bold text-white transition hover:bg-[#1d4ed8]">Subscribe <ArrowRight size={14} /></button></form>{message && <p role="status" className={`mt-2 flex items-center gap-1.5 text-[10px] ${success ? "text-emerald-200" : "text-rose-200"}`}>{success && <CheckCircle2 size={12} />}{message}</p>}<p className="mt-2 text-[9px] text-blue-100/55">Email is saved locally in this demo; no email campaign service is connected.</p></div>
+    </div>
+  </section>;
 }

@@ -256,7 +256,7 @@ export default function RegisterForm() {
       >
         {busy ? (
           <>
-            <Loader2 size={17} className="animate-spin" />
+            <Loader2 size={17} className="motion-safe:animate-spin motion-reduce:animate-none" />
             <span>Creating account...</span>
           </>
         ) : (

@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import Container from "../Layout/Container";
 import {
   ArrowLeft,
   RotateCcw,
@@ -24,7 +25,7 @@ const contentMap = {
     eyebrow: "NEW CUSTOMER",
     title: "Create an account",
     subtitle:
-      "Join Hash Online Store to enjoy faster checkout, real-time tracking, and exclusive discounts.",
+      "Join Hash Online Store for faster checkout, order status updates, and exclusive discounts.",
     heroBadge: "EXCLUSIVE ACCESS",
     heroTitle: "Good finds start right here.",
     heroDesc:
@@ -34,7 +35,7 @@ const contentMap = {
     eyebrow: "ACCOUNT SUPPORT",
     title: "Forgot password?",
     subtitle:
-      "Enter the email associated with your account and we will send you password reset instructions.",
+      "Password recovery is not connected in this frontend demo. Contact store support for help.",
     heroBadge: "SECURE RECOVERY",
     heroTitle: "Account recovery made simple.",
     heroDesc:
@@ -46,7 +47,7 @@ export default function AccountWrapper({ mode = "login", children }) {
   const current = contentMap[mode] || contentMap.login;
 
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1120px] px-4 py-12 max-[600px]:py-7">
+    <Container as="main" className="min-h-[55vh] py-12 max-[600px]:py-7">
       <div className="grid min-h-[620px] grid-cols-[1fr_1.2fr] overflow-hidden rounded-3xl border border-[#e4eaf3] bg-white shadow-[0_20px_50px_rgba(16,36,73,.08)] max-[900px]:grid-cols-1">
         {/* Left Column: Brand Hero & Trust Showcase */}
         <section className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-[#091b42] via-[#0f2e69] to-[#07173b] p-8 text-white sm:p-10 lg:p-12 max-[900px]:min-h-[300px]">
@@ -78,7 +79,7 @@ export default function AccountWrapper({ mode = "login", children }) {
                   Express Pakistan-Wide Delivery
                 </h4>
                 <p className="text-[11px] text-[#a9c6ff]">
-                  Safe doorstep delivery with live parcel tracking
+                  Order status appears in your account. Live courier tracking requires store integration.
                 </p>
               </div>
             </div>
@@ -120,7 +121,7 @@ export default function AccountWrapper({ mode = "login", children }) {
                 ))}
               </div>
               <span className="font-semibold text-[#cad8f3]">
-                Rated 4.9/5 by 25,000+ happy shoppers
+                Demo storefront · sample catalog ratings
               </span>
             </div>
 
@@ -167,6 +168,6 @@ export default function AccountWrapper({ mode = "login", children }) {
           {children}
         </section>
       </div>
-    </main>
+    </Container>
   );
 }

@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import {
   ArrowRight,
   MapPin,
   CheckCircle2,
   Package,
-  Truck,
   Copy,
   Check,
   ShoppingBag,
@@ -13,10 +12,13 @@ import {
 } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 import CheckoutSteps from "../components/Checkout/CheckoutSteps";
 import PaymentMethod from "../components/Checkout/PaymentMethod";
 import CheckoutSummary from "../components/Checkout/OrderSummary";
 import { notify } from "../components/Common/Toast";
+import { openWhatsApp } from "../utils/whatsapp";
+import WhatsAppIcon from "../components/Common/WhatsAppIcon";
 
 const currency = (n) => `Rs. ${Number(n || 0).toLocaleString()}`;
 
@@ -24,7 +26,8 @@ const currency = (n) => `Rs. ${Number(n || 0).toLocaleString()}`;
 const PK_PHONE_REGEX = /^((\+92)|(0092)|(92)|0)?(3[0-9]{2})[- ]?([0-9]{7})$/;
 
 export default function Checkout() {
-  const { cart, products, placeOrder, cartTotals, user, addresses } = useStore();
+  const { cart, products, placeOrder, cartTotals, user, addresses, orders, settings } =
+    useStore();
   const navigate = useNavigate();
   const [payment, setPayment] = useState("cod");
   const [submitting, setSubmitting] = useState(false);
@@ -33,9 +36,9 @@ export default function Checkout() {
 
   // Address fields state
   const [formData, setFormData] = useState({
-    name: user?.name || "",
+    name: user?.role === "admin" ? "" : user?.name || "",
     phone: "",
-    email: user?.email || "",
+    email: user?.role === "admin" ? "" : user?.email || "",
     address: "",
     city: "",
     postal: "",
@@ -43,6 +46,18 @@ export default function Checkout() {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Restore the confirmation after a refresh (cart is empty once an order is placed)
+  useEffect(() => {
+    if (placedOrder || cart.length) return;
+    try {
+      const lastId = sessionStorage.getItem("hash-last-order");
+      const found = lastId && orders.find((o) => o.id === lastId);
+      if (found) setPlacedOrder(found);
+    } catch {
+      // sessionStorage unavailable
+    }
+  }, [placedOrder, cart.length, orders]);
 
   const userAddresses = addresses.filter(
     (a) => a.userId === (user?.id || "guest"),
@@ -138,6 +153,11 @@ export default function Checkout() {
           // ignore if sessionStorage is unavailable
         }
       }
+      try {
+        sessionStorage.setItem("hash-last-order", result.order.id);
+      } catch {
+        // ignore
+      }
       setPlacedOrder(result.order);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -145,129 +165,94 @@ export default function Checkout() {
     }
   };
 
-  const handleCopyOrderId = () => {
+  const handleCopyOrderId = async () => {
     if (!placedOrder?.id) return;
-    navigator.clipboard.writeText(placedOrder.id);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
+    try {
+      await navigator.clipboard.writeText(placedOrder.id);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    } catch {
+      notify("Could not copy. Please copy the Order ID manually.");
+    }
+  };
+
+  const leaveSuccess = () => {
+    try {
+      sessionStorage.removeItem("hash-last-order");
+    } catch {
+      // ignore
+    }
   };
 
   // ORDER SUCCESS SCREEN
   if (placedOrder) {
+    const waMessage = `Assalam-o-Alaikum! I placed order #${placedOrder.id}. Please confirm it.`;
+
     return (
-      <main className="mx-auto min-h-[60vh] w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="overflow-hidden rounded-3xl border border-[#e2e8f0] bg-white p-6 sm:p-10 shadow-xl text-center">
-          {/* Animated Green Checkmark */}
-          <div className="mx-auto mb-6 relative flex size-20 items-center justify-center rounded-full bg-[#e9f8ed] text-[#16a34a] shadow-inner">
-            <div className="absolute inset-0 rounded-full bg-[#16a34a]/15 animate-ping" />
-            <CheckCircle2 size={44} className="relative z-10 animate-bounce" strokeWidth={2.5} />
+      <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-16">
+        {/* Header */}
+        <header className="text-center">
+          <div className="relative mx-auto mb-6 grid size-20 place-items-center">
+            <span className="motion-safe:animate-ring absolute inset-0 rounded-full bg-emerald-500/25" />
+            <span className="motion-safe:animate-pop relative grid size-20 place-items-center rounded-full bg-emerald-100 text-emerald-600">
+              <CheckCircle2 size={44} strokeWidth={2.25} />
+            </span>
           </div>
-
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e9f8ed] px-3.5 py-1 text-xs font-bold text-[#16a34a]">
-            Order Confirmed
+          <span className="motion-safe:animate-fade-up inline-flex rounded-full bg-emerald-100 px-3.5 py-1 text-sm font-bold text-emerald-700">
+            Order placed
           </span>
-
-          <h1 className="mt-3 text-2xl sm:text-3xl font-extrabold text-[#17233b]">
+          <h1 className="motion-safe:animate-fade-up mt-4 text-3xl font-extrabold tracking-tight text-[#102449] [animation-delay:80ms] sm:text-4xl">
             Thank you for your order!
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-[#64748b] max-w-md mx-auto">
-            We have received your order and are dispatching it with express courier service.
+          <p className="motion-safe:animate-fade-up mx-auto mt-3 max-w-md text-base leading-7 text-slate-600 [animation-delay:140ms]">
+            We have received your order. Our team will confirm it
           </p>
 
-          {/* Order ID Pill */}
-          <div className="my-6 inline-flex items-center gap-3 rounded-2xl border border-[#dce5f3] bg-[#f8fafd] px-4 py-2.5">
-            <span className="text-xs font-semibold text-[#64748b]">Order ID:</span>
-            <code className="text-sm font-extrabold text-[#17233b]">
-              #{placedOrder.id}
-            </code>
+          <div className="motion-safe:animate-fade-up mt-6 inline-flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-slate-300/70 px-4 py-2.5 [animation-delay:200ms]">
+            <span className="text-sm font-semibold text-slate-600">Order ID</span>
+            <code className="text-base font-extrabold text-[#102449]">#{placedOrder.id}</code>
             <button
               type="button"
               onClick={handleCopyOrderId}
-              className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-white border border-[#cbd5e1] px-2 py-0.5 text-[11px] font-bold text-[#475569] hover:bg-[#eff4ff] hover:text-[#2563eb]"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-300 px-2.5 py-1 text-sm font-bold text-slate-700 transition-colors duration-200 hover:border-brand hover:text-brand focus-visible:ring-2 focus-visible:ring-brand focus-visible:outline-none"
               title="Copy Order ID"
             >
               {copiedId ? (
                 <>
-                  <Check size={12} className="text-[#16a34a]" /> Copied
+                  <Check size={14} className="text-emerald-600" /> Copied
                 </>
               ) : (
                 <>
-                  <Copy size={12} /> Copy
+                  <Copy size={14} /> Copy
                 </>
               )}
             </button>
           </div>
+        </header>
 
-          {/* Delivery & Address Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left my-6">
-            <div className="rounded-2xl border border-[#edf0f5] bg-[#fafbfc] p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#17233b] mb-1">
-                <Truck size={15} className="text-[#2563eb]" /> Estimated Delivery
-              </div>
-              <p className="text-xs text-[#64748b]">
-                2 - 3 Business Days via Express Courier
-              </p>
-              <span className="mt-2 inline-block text-[11px] font-semibold text-[#16a34a]">
-                Doorstep Delivery across Pakistan
-              </span>
-            </div>
-
-            <div className="rounded-2xl border border-[#edf0f5] bg-[#fafbfc] p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#17233b] mb-1">
-                <MapPin size={15} className="text-[#2563eb]" /> Shipping Details
-              </div>
-              <p className="text-xs text-[#17233b] font-semibold">
-                {placedOrder.customerName || formData.name}
-              </p>
-              <p className="text-xs text-[#64748b] truncate">
-                {placedOrder.shippingAddress || formData.address}, {placedOrder.city || formData.city}
-              </p>
-              <p className="text-[11px] text-[#64748b]">
-                Phone: {placedOrder.phone || formData.phone}
-              </p>
-            </div>
-          </div>
-
-          {/* Summary Box */}
-          <div className="rounded-2xl border border-[#edf0f5] bg-[#f8fafd] p-4 sm:p-5 text-left mb-8">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#64748b] mb-3">
-              Order Summary ({placedOrder.items?.length || 0} items)
-            </h3>
-            <div className="divide-y divide-[#edf0f5]">
-              {(placedOrder.items || []).map((it, idx) => (
-                <div key={idx} className="flex justify-between items-center py-2 text-xs">
-                  <span className="text-[#334155] font-medium truncate max-w-[240px]">
-                    {it.product?.name || `Product #${it.id}`} × {it.qty}
-                  </span>
-                  <span className="font-bold text-[#17233b]">
-                    {currency(Number(it.product?.price || 0) * Number(it.qty))}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="border-t border-[#e2e8f0] mt-3 pt-3 flex justify-between items-baseline text-sm font-extrabold text-[#17233b]">
-              <span>Total Paid / Payable</span>
-              <span className="text-base text-[#2563eb]">{currency(placedOrder.total)}</span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              to={`/orders/${placedOrder.id}`}
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-6 py-3 text-xs font-bold text-white shadow-md transition hover:bg-[#1d4ed8] active:scale-95"
-            >
-              <Package size={15} />
-              <span>Track Order Live</span>
-            </Link>
-            <Link
-              to="/products"
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-[#cbd5e1] bg-white px-6 py-3 text-xs font-bold text-[#334155] transition hover:bg-[#f8fafc] active:scale-95"
-            >
-              <ShoppingBag size={15} />
-              <span>Continue Shopping</span>
-            </Link>
-          </div>
+        {/* Actions */}
+        <div className="motion-safe:animate-fade-up mt-8 grid grid-cols-1 gap-3 [animation-delay:380ms] sm:grid-cols-3">
+          <Link
+            to={`/orders/${placedOrder.id}`}
+            onClick={leaveSuccess}
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-brand px-4 py-3.5 text-base font-bold text-white transition duration-200 hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95"
+          >
+            <Package size={18} /> View order
+          </Link>
+          <button
+            type="button"
+            onClick={() => openWhatsApp(waMessage, settings?.whatsappNumber)}
+            className="inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-emerald-600 px-4 py-3.5 text-base font-bold text-emerald-700 transition duration-200 hover:bg-emerald-600 hover:text-white focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95"
+          >
+            <WhatsAppIcon className="size-5" /> WhatsApp
+          </button>
+          <Link
+            to="/products"
+            onClick={leaveSuccess}
+            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-slate-400/70 px-4 py-3.5 text-base font-bold text-slate-700 transition duration-200 hover:bg-[#e9f0fb] focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95"
+          >
+            <ShoppingBag size={18} /> Continue shopping
+          </Link>
         </div>
       </main>
     );
@@ -275,7 +260,7 @@ export default function Checkout() {
 
   // STANDARD CHECKOUT FORM
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
       <PageHeading eyebrow="SECURE CHECKOUT" title="Checkout">
         <p>Review your shipping address and complete your order.</p>
       </PageHeading>
@@ -324,6 +309,8 @@ export default function Checkout() {
                       : "border-[#dce5f3] focus:border-[#2563eb]"
                   }`}
                   name="name"
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? "checkout-name-error" : undefined}
                   value={formData.name}
                   onChange={handleFieldChange}
                   required
@@ -331,7 +318,7 @@ export default function Checkout() {
                   placeholder="e.g. Muhammad Ali"
                 />
                 {errors.name && (
-                  <span className="flex items-center gap-1 text-[11px] text-[#ef4444]">
+                  <span id="checkout-name-error" className="flex items-center gap-1 text-[11px] text-[#ef4444]">
                     <AlertCircle size={12} /> {errors.name}
                   </span>
                 )}
@@ -348,6 +335,8 @@ export default function Checkout() {
                       : "border-[#dce5f3] focus:border-[#2563eb]"
                   }`}
                   name="phone"
+                  aria-invalid={Boolean(errors.phone)}
+                  aria-describedby={errors.phone ? "checkout-phone-error" : undefined}
                   value={formData.phone}
                   onChange={handleFieldChange}
                   required
@@ -356,7 +345,7 @@ export default function Checkout() {
                   placeholder="0300-1234567"
                 />
                 {errors.phone ? (
-                  <span className="flex items-center gap-1 text-[11px] text-[#ef4444]">
+                  <span id="checkout-phone-error" className="flex items-center gap-1 text-[11px] text-[#ef4444]">
                     <AlertCircle size={12} /> {errors.phone}
                   </span>
                 ) : (
@@ -377,6 +366,8 @@ export default function Checkout() {
                       : "border-[#dce5f3] focus:border-[#2563eb]"
                   }`}
                   name="email"
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? "checkout-email-error" : undefined}
                   value={formData.email}
                   onChange={handleFieldChange}
                   type="email"
@@ -385,7 +376,7 @@ export default function Checkout() {
                   placeholder="you@example.com"
                 />
                 {errors.email && (
-                  <span className="flex items-center gap-1 text-[11px] text-[#ef4444]">
+                  <span id="checkout-email-error" className="flex items-center gap-1 text-[11px] text-[#ef4444]">
                     <AlertCircle size={12} /> {errors.email}
                   </span>
                 )}
@@ -402,6 +393,8 @@ export default function Checkout() {
                       : "border-[#dce5f3] focus:border-[#2563eb]"
                   }`}
                   name="address"
+                  aria-invalid={Boolean(errors.address)}
+                  aria-describedby={errors.address ? "checkout-address-error" : undefined}
                   value={formData.address}
                   onChange={handleFieldChange}
                   required
@@ -409,7 +402,7 @@ export default function Checkout() {
                   placeholder="House #, Street #, Sector / Block, Area"
                 />
                 {errors.address && (
-                  <span className="flex items-center gap-1 text-[11px] text-[#ef4444]">
+                  <span id="checkout-address-error" className="flex items-center gap-1 text-[11px] text-[#ef4444]">
                     <AlertCircle size={12} /> {errors.address}
                   </span>
                 )}
@@ -426,6 +419,8 @@ export default function Checkout() {
                       : "border-[#dce5f3] focus:border-[#2563eb]"
                   }`}
                   name="city"
+                  aria-invalid={Boolean(errors.city)}
+                  aria-describedby={errors.city ? "checkout-city-error" : undefined}
                   value={formData.city}
                   onChange={handleFieldChange}
                   required
@@ -433,7 +428,7 @@ export default function Checkout() {
                   placeholder="e.g. Lahore, Karachi, Islamabad"
                 />
                 {errors.city && (
-                  <span className="flex items-center gap-1 text-[11px] text-[#ef4444]">
+                  <span id="checkout-city-error" className="flex items-center gap-1 text-[11px] text-[#ef4444]">
                     <AlertCircle size={12} /> {errors.city}
                   </span>
                 )}
@@ -486,6 +481,6 @@ export default function Checkout() {
 
         <CheckoutSummary items={items} totals={cartTotals} />
       </form>
-    </main>
+    </Container>
   );
 }

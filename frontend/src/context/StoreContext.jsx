@@ -841,7 +841,6 @@ export function StoreProvider({ children }) {
         ? previous.filter((item) => item !== id)
         : [...previous, id],
     );
-
   const applyCoupon = (code) => {
     const normalized = String(code || "")
       .trim()

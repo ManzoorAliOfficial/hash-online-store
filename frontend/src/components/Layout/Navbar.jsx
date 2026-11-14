@@ -5,6 +5,7 @@ import { useStore } from "../../context/StoreContext";
 import storeLogo from "../../assets/icons/Store.svg";
 import AnnouncementBar from "./AnnouncementBar";
 import SearchModal from "./SearchModal";
+import Container from "./Container";
 
 const navClass = ({ isActive }) =>
   `text-base font-semibold transition hover:text-[#2563eb] ${isActive ? "text-[#2563eb]" : "text-[#43536c]"}`;
@@ -14,6 +15,7 @@ const mobileClass = ({ isActive }) =>
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { cartCount, wishlist, user, openCartDrawer } = useStore();
   const close = () => setOpen(false);
 
@@ -26,11 +28,19 @@ export default function Navbar() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [open]);
 
+  useEffect(() => {
+    const updateScrollState = () => setScrolled(window.scrollY > 10);
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => window.removeEventListener("scroll", updateScrollState);
+  }, []);
+
   return (
     <>
       <AnnouncementBar />
 
-      <header className="sticky top-0 z-40 flex h-[70px] items-center justify-between border-b border-[#e8edf4] bg-white px-[max(calc((100vw-1690px)/2),6%)] shadow-xs max-[900px]:h-[72px] max-[600px]:px-4">
+      <header className={`sticky top-0 z-40 h-[70px] w-full border-b border-[#e8edf4] transition-[box-shadow,background-color] duration-200 max-[900px]:h-[72px] ${scrolled ? "bg-white/95 shadow-md backdrop-blur" : "bg-white shadow-xs"}`}>
+        <Container className="flex h-full items-center justify-between">
         <Link
           className="flex items-center"
           to="/"
@@ -38,7 +48,7 @@ export default function Navbar() {
           onClick={close}
         >
           <img
-            className="h-[46px] w-auto max-w-[220px] max-[900px]:h-10 max-[600px]:h-8"
+            className="h-[46px] w-auto max-w-[220px] max-[900px]:h-10 max-[600px]:h-8 max-[380px]:h-7 max-[380px]:max-w-[100px]"
             src={storeLogo}
             alt="Hash Online Store"
           />
@@ -69,10 +79,10 @@ export default function Navbar() {
           </NavLink>
         </nav>
 
-        <div className="flex items-center gap-4 text-[#203653] max-[900px]:gap-2.5">
+        <div className="flex items-center gap-4 text-[#203653] max-[900px]:gap-2.5 max-[380px]:gap-1">
           <button
             type="button"
-            className="grid size-10 cursor-pointer place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
+            className="grid size-10 cursor-pointer place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb] max-[380px]:size-8"
             onClick={() => setSearchOpen(true)}
             aria-label="Search products"
             title="Search products (Ctrl+K)"
@@ -87,7 +97,7 @@ export default function Navbar() {
             aria-label="Wishlist"
             title="Wishlist"
             className={({ isActive }) =>
-              `relative grid size-10 place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb] ${isActive ? "text-[#2563eb] bg-[#eff4ff]" : ""}`
+              `relative grid size-10 place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb] max-[380px]:size-8 ${isActive ? "text-[#2563eb] bg-[#eff4ff]" : ""}`
             }
           >
             <Heart className="size-5 max-[900px]:size-[18px]" strokeWidth={2} />
@@ -98,7 +108,7 @@ export default function Navbar() {
             )}
           </NavLink>
           <Link
-            className="grid size-10 place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
+            className="grid size-10 place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb] max-[380px]:size-8"
             to={user ? "/profile" : "/login"}
             aria-label="Account"
             title="Account"
@@ -113,33 +123,34 @@ export default function Navbar() {
             onClick={openCartDrawer}
             aria-label="Cart"
             title="Cart"
-            className="relative grid size-10 cursor-pointer place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb]"
+            className="relative grid size-10 cursor-pointer place-items-center rounded-lg p-1 transition hover:bg-[#f4f7fc] hover:text-[#2563eb] max-[380px]:size-8"
           >
             <ShoppingBag
               className="size-5 max-[900px]:size-[18px]"
               strokeWidth={2}
             />
             {cartCount > 0 && (
-              <i className="absolute right-1 top-1 grid size-[18px] place-items-center rounded-full bg-[#f97316] text-[10px] font-black not-italic text-white shadow-xs">
+              <i key={cartCount} className="absolute right-1 top-1 grid size-[18px] place-items-center rounded-full bg-[#f97316] text-[10px] font-black not-italic text-white shadow-xs motion-safe:animate-pop motion-reduce:animate-none">
                 {cartCount > 99 ? "99+" : cartCount}
               </i>
             )}
           </button>
           <button
-            className="grid size-10 place-items-center rounded-lg text-[#203653] hover:bg-[#f4f7fc] lg:hidden"
+            className="grid size-10 place-items-center rounded-lg text-[#203653] hover:bg-[#f4f7fc] lg:hidden max-[380px]:size-8"
             type="button"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((value) => !value)}
           >
-            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+            {open ? <X className="size-5 max-[380px]:size-4" /> : <Menu className="size-5 max-[380px]:size-4" />}
           </button>
         </div>
 
-        {open && (
-          <nav
-            className="absolute left-0 right-0 top-full z-50 grid gap-1 border-b border-[#e4eaf3] bg-white p-4 shadow-xl lg:hidden"
+        <nav
+            className={`absolute left-0 right-0 top-full z-50 grid gap-1 border-b border-[#e4eaf3] bg-white p-4 shadow-xl transition-[transform,opacity,visibility] duration-200 ease-out lg:hidden ${open ? "visible translate-y-0 opacity-100" : "invisible pointer-events-none -translate-y-2 opacity-0"} motion-reduce:transition-none`}
             aria-label="Mobile navigation"
+            aria-hidden={!open}
+            inert={!open}
           >
             <NavLink to="/" end className={mobileClass} onClick={close}>
               Home
@@ -181,8 +192,8 @@ export default function Navbar() {
                 </span>
               )}
             </button>
-          </nav>
-        )}
+        </nav>
+        </Container>
       </header>
 
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import {
   X,
@@ -30,6 +30,20 @@ export default function CartDrawer() {
 
   const navigate = useNavigate();
   const drawerRef = useRef(null);
+  const [mounted, setMounted] = useState(cartDrawerOpen);
+  const [presentOpen, setPresentOpen] = useState(false);
+
+  useEffect(() => {
+    if (cartDrawerOpen) {
+      setMounted(true);
+      const frame = window.requestAnimationFrame(() => setPresentOpen(true));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    setPresentOpen(false);
+    const timer = window.setTimeout(() => setMounted(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [cartDrawerOpen]);
 
   // Focus trap & Escape key listener
   useEffect(() => {
@@ -51,7 +65,7 @@ export default function CartDrawer() {
     };
   }, [cartDrawerOpen, closeCartDrawer]);
 
-  if (!cartDrawerOpen) return null;
+  if (!mounted) return null;
 
   const threshold =
     Number(settings.freeDeliveryThreshold) > 0
@@ -89,7 +103,10 @@ export default function CartDrawer() {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex justify-end bg-black/50 backdrop-blur-xs transition-opacity duration-300"
+      data-state={presentOpen ? "open" : "closed"}
+      aria-hidden={!presentOpen}
+      inert={!presentOpen}
+      className="fixed inset-0 z-[60] flex justify-end bg-black/50 backdrop-blur-xs transition-opacity duration-300 data-[state=closed]:pointer-events-none data-[state=closed]:opacity-0 data-[state=open]:opacity-100 motion-reduce:transition-none"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeCartDrawer();
       }}
@@ -99,7 +116,8 @@ export default function CartDrawer() {
     >
       <div
         ref={drawerRef}
-        className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-out"
+        data-state={presentOpen ? "open" : "closed"}
+        className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300 ease-out data-[state=closed]:translate-x-full data-[state=open]:translate-x-0 motion-reduce:transition-none"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#edf0f5] px-5 py-4">

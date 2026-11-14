@@ -74,6 +74,7 @@ export default function CartItem({ item }) {
       </div>
 
       <div
+        role="group"
         className="flex h-9 items-center rounded-lg border border-[#dce5f3] bg-white shadow-2xs"
         aria-label={`Quantity for ${product.name}`}
       >

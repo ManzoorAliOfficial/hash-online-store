@@ -6,7 +6,7 @@ export default function Loader({ label = "Loading" }) {
       role="status"
       aria-label={label}
     >
-      <LoaderCircle className="animate-spin text-[#2563eb]" size={24} />
+      <LoaderCircle className="text-[#2563eb] motion-safe:animate-spin motion-reduce:animate-none" size={24} />
       <span>{label}…</span>
     </div>
   );

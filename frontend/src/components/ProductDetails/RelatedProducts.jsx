@@ -10,7 +10,7 @@ export default function RelatedProducts({ product }) {
     )
     .slice(0, 4);
   return (
-    <section className="mx-auto mt-[76px] max-w-[1120px] max-[600px]:mt-[52px]">
+    <section className="mt-[76px] w-full max-[600px]:mt-[52px]">
       <div className="mb-6">
         <div>
           <span className="text-[10px] font-extrabold tracking-[.14em] text-[#2563eb]">

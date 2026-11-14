@@ -1,37 +1,34 @@
 import { Link } from "react-router";
 import { useState } from "react";
-import {
-  ArrowRight,
-  Mail,
-  Phone,
-  ArrowUp,
-} from "lucide-react";
-import storeLogo from "../../assets/icons/hash-online-store-wordmark.svg";
+import { ArrowRight, Mail, Phone } from "lucide-react";
+import storeLogo from "../../assets/icons/Store.svg";
+
+import Container from "./Container";
 import { useStore } from "../../context/StoreContext";
 import { normalizePkNumber, DEFAULT_WHATSAPP_NUMBER } from "../../utils/whatsapp";
+
+// Fallback links used when the store settings don't define one. Replace with your real pages.
+const DEFAULT_SOCIAL_URLS = {
+  facebook: "https://www.facebook.com/",
+  instagram: "https://www.instagram.com/",
+  tiktok: "https://www.tiktok.com/",
+};
+
+const safeSocialUrl = (value) => {
+  try {
+    const url = new URL(String(value || "").trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+  } catch {
+    return "";
+  }
+};
 
 function BrandIcon({ name, className = "" }) {
   if (name === "instagram")
     return (
       <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-        <rect
-          x="3"
-          y="3"
-          width="18"
-          height="18"
-          rx="5"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
-        <circle
-          cx="12"
-          cy="12"
-          r="4"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        />
+        <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2" />
+        <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" />
         <circle cx="17.5" cy="6.7" r="1.2" fill="currentColor" />
       </svg>
     );
@@ -62,19 +59,78 @@ function BrandIcon({ name, className = "" }) {
         />
       </svg>
     );
+  if (name === "facebook")
+    return (
+      <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M13.5 22v-8.2h2.8l.5-3.3h-3.3V8.4c0-.9.4-1.7 1.8-1.7h1.6V3.8S15.1 3.5 13.9 3.5c-2.6 0-4.3 1.6-4.3 4.4v2.6H6.8v3.3h2.8V22h3.9Z"
+        />
+      </svg>
+    );
+  if (name === "tiktok") {
+    const note =
+      "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07Z";
+    return (
+      <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+        <g transform="translate(3.6 3.6) scale(.7)">
+          <path fill="#25F4EE" transform="translate(-.9 -.9)" d={note} />
+          <path fill="#FE2C55" transform="translate(.9 .9)" d={note} />
+          <path fill="#fff" d={note} />
+        </g>
+      </svg>
+    );
+  }
   return null;
+}
+
+// Shared styles so every column looks identical.
+const headingClass = "text-sm font-semibold tracking-wide text-white";
+const linkClass =
+  "text-sm text-[#cad8f3] transition-colors hover:text-white focus-visible:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white rounded-sm";
+
+const exploreLinks = [
+  { label: "Shop all products", to: "/products" },
+  { label: "Wishlist", to: "/wishlist" },
+  { label: "Track an order", to: "/orders" },
+  { label: "My account", to: "/profile" },
+];
+
+const companyLinks = [
+  { label: "About us", to: "/about" },
+  { label: "Contact us", to: "/contact" },
+  { label: "Terms of use", to: "/terms" },
+];
+
+function LinkColumn({ title, links }) {
+  return (
+    <nav aria-label={title}>
+      <h2 className={headingClass}>{title}</h2>
+      <ul className="mt-3 flex flex-col gap-2">
+        {links.map((item) => (
+          <li key={item.label}>
+            <Link className={linkClass} to={item.to}>
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
 }
 
 export default function Footer() {
   const { subscribe, settings } = useStore();
   const [message, setMessage] = useState("");
+
   const submit = (event) => {
     event.preventDefault();
-    const email = new FormData(event.currentTarget).get("email");
-    subscribe(email);
+    const value = new FormData(event.currentTarget).get("email");
+    subscribe(value);
     event.currentTarget.reset();
     setMessage("Subscribed in this browser demo.");
   };
+
   const phone = String(settings.supportPhone || "").trim();
   const email = String(settings.supportEmail || "").trim();
   const whatsappDigits = normalizePkNumber(
@@ -83,194 +139,119 @@ export default function Footer() {
   const whatsappUrl = whatsappDigits
     ? `https://wa.me/${whatsappDigits}`
     : "https://wa.me/923013858980";
+  const contactNumber = phone || (whatsappDigits ? `+${whatsappDigits}` : "");
+  const contactNumberHref = phone ? `tel:${phone}` : whatsappUrl;
 
-  // Social platforms only. Email and phone are shown as contact lines below.
+  // Brand-coloured buttons. Replace the DEFAULT_SOCIAL_URLS above with your real
+  // pages, or set facebookUrl / instagramUrl / tiktokUrl in your store settings.
   const socialLinks = [
+    { name: "WhatsApp", href: whatsappUrl, icon: "whatsapp", bg: "bg-[#25D366]" },
     {
-      name: "WhatsApp",
-      href: whatsappUrl,
-      icon: "whatsapp",
+      name: "Facebook",
+      href: safeSocialUrl(settings.facebookUrl || DEFAULT_SOCIAL_URLS.facebook),
+      icon: "facebook",
+      bg: "bg-[#1877F2]",
     },
     {
       name: "Instagram",
-      href: settings.instagramUrl || "https://www.instagram.com/",
+      href: safeSocialUrl(settings.instagramUrl || DEFAULT_SOCIAL_URLS.instagram),
       icon: "instagram",
+      bg: "bg-[radial-gradient(circle_at_30%_107%,#fdf497_0%,#fdf497_5%,#fd5949_45%,#d6249f_60%,#285AEB_90%)]",
+    },
+    {
+      name: "TikTok",
+      href: safeSocialUrl(settings.tiktokUrl || DEFAULT_SOCIAL_URLS.tiktok),
+      icon: "tiktok",
+      bg: "bg-black ring-1 ring-white/25",
     },
     {
       name: "X (Twitter)",
-      href: settings.twitterUrl || "https://x.com/",
+      href: safeSocialUrl(settings.twitterUrl),
       icon: "twitter",
+      bg: "bg-black ring-1 ring-white/25",
     },
     {
       name: "LinkedIn",
-      href: settings.linkedinUrl || "https://www.linkedin.com/",
+      href: safeSocialUrl(settings.linkedinUrl),
       icon: "linkedin",
+      bg: "bg-[#0A66C2]",
     },
-  ];
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  ].filter((item) => item.href);
 
   return (
-    <footer
-      id="footer"
-      className="mt-auto border-t border-[#e2e8f0] bg-[#f5f8fd] px-4 pt-10 pb-4 text-[#728097] sm:px-6 sm:pt-11 lg:px-[max(calc((100vw-1120px)/2),5%)]"
-    >
-      {/* Main Grid:
-          - Mobile (< 640px): 2 columns. Brand spans 2 cols. Explore (col 1) & Customer care (col 2) sit side-by-side. Newsletter spans 2 cols.
-          - Tablet (640px - 1024px): 2x2 grid.
-          - Desktop (1024px+): 4 columns.
-      */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-9 pb-8 sm:gap-8 lg:grid-cols-[1.3fr_.8fr_.9fr_1.2fr] lg:gap-[35px]">
-        {/* Col 1: Brand Info */}
-        <div className="col-span-2 sm:col-span-1 lg:col-span-1">
-          <Link
-            className="inline-flex"
-            to="/"
-            aria-label="Hash Online Store home"
-          >
+    <footer id="footer" className="relative mt-16 bg-[#102449] text-[#eaf1ff]">
+      <svg
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-10 w-full"
+        viewBox="0 0 1440 40"
+        preserveAspectRatio="none"
+      >
+        <path
+          fill="#f5f8fd"
+          d="M0 0h1440v14c-122-8-196-10-290-2-171 15-256 31-438 23C535 29 397 5 267 13 151 20 82 35 0 33V0Z"
+        />
+      </svg>
+
+      <Container className="grid grid-cols-2 gap-x-6 gap-y-8 pb-10 pt-16 lg:grid-cols-[1.3fr_.75fr_.75fr_1.3fr] lg:gap-x-12 lg:pt-14">
+        {/* Brand + social */}
+        <div className="col-span-2 lg:col-span-1">
+          <Link className="inline-flex" to="/" aria-label="Hash Online Store home">
             <img
-              className="h-8 sm:h-9 w-auto"
+              className="h-9 w-auto brightness-0 invert"
               src={storeLogo}
               alt="Hash Online Store"
             />
           </Link>
-          <p className="mt-3 sm:mt-4 text-xs sm:text-[11px] leading-relaxed text-[#627187]">
-            Quality Products. Fast Delivery.
-            <br />
-            Trusted Shopping.
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-[#cad8f3]">
+            Mobile accessories. Clear details. Helpful support.
           </p>
-
-          <div className="mt-5 sm:mt-6">
-            <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
-              Follow us
-            </span>
-
-            <ul
-              className="mt-3 flex flex-wrap gap-2"
-              aria-label="Social media"
-            >
+          {socialLinks.length > 0 && (
+            <ul className="mt-5 flex items-center gap-2" aria-label="Social media">
               {socialLinks.map((item) => (
                 <li key={item.name}>
                   <a
-                    className="group relative inline-flex size-9 cursor-pointer items-center justify-center rounded-lg border border-[#e3e8f0] bg-white text-[#52617a] transition duration-200 hover:-translate-y-0.5 hover:border-[#102449] hover:bg-[#102449] hover:text-white active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+                    className={`inline-flex size-9 items-center justify-center rounded-full text-white shadow-sm transition hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${item.bg}`}
                     href={item.href}
                     aria-label={item.name}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     <BrandIcon name={item.icon} className="size-4" />
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-[#102449] px-2 py-1 text-[10px] font-medium text-white opacity-0 shadow-sm transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
-                    >
-                      {item.name}
-                    </span>
                   </a>
                 </li>
               ))}
             </ul>
+          )}
+        </div>
 
-            {(email || phone) && (
-              <ul className="mt-4 flex flex-col gap-1.5 text-xs sm:text-[11px]">
-                {email && (
-                  <li>
-                    <a
-                      className="inline-flex items-center gap-2 py-1 text-[#52617a] transition hover:text-[#2563eb]"
-                      href={"mailto:" + email}
-                    >
-                      <Mail size={14} className="shrink-0 text-[#8a96a8]" />
-                      <span className="break-all">{email}</span>
-                    </a>
-                  </li>
-                )}
-                {phone && (
-                  <li>
-                    <a
-                      className="inline-flex items-center gap-2 py-1 text-[#52617a] transition hover:text-[#2563eb]"
-                      href={"tel:" + phone}
-                    >
-                      <Phone size={14} className="shrink-0 text-[#8a96a8]" />
-                      <span>{phone}</span>
-                    </a>
-                  </li>
-                )}
-              </ul>
+        <LinkColumn title="Explore" links={exploreLinks} />
+        <LinkColumn title="Company" links={companyLinks} />
+
+        {/* Contact + newsletter */}
+        <div className="col-span-2 lg:col-span-1">
+          <h2 className={headingClass}>Contact</h2>
+          <div className="mt-3 flex flex-col gap-2">
+            {contactNumber && (
+              <a className={`${linkClass} inline-flex items-center gap-2`} href={contactNumberHref}>
+                <Phone size={14} className="shrink-0" aria-hidden="true" />
+                {contactNumber}
+              </a>
+            )}
+            {email && (
+              <a className={`${linkClass} inline-flex items-center gap-2 break-all`} href={`mailto:${email}`}>
+                <Mail size={14} className="shrink-0" aria-hidden="true" />
+                {email}
+              </a>
             )}
           </div>
-        </div>
 
-        {/* Col 2: Explore */}
-        <div className="col-span-1 flex flex-col items-start gap-2.5 text-xs sm:text-[11px]">
-          <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
-            Explore
-          </span>
-          <Link
-            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
-            to="/products"
-          >
-            All products
-          </Link>
-          <Link
-            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
-            to="/products"
-          >
-            Categories
-          </Link>
-          <Link
-            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
-            to="/about"
-          >
-            About us
-          </Link>
-        </div>
-
-        {/* Col 3: Customer care */}
-        <div className="col-span-1 flex flex-col items-start gap-2.5 text-xs sm:text-[11px]">
-          <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
-            Customer care
-          </span>
-          <Link
-            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
-            to="/orders"
-          >
-            Track an order
-          </Link>
-          <Link
-            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
-            to="/contact"
-          >
-            Contact us
-          </Link>
-          <Link
-            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
-            to="/login"
-          >
-            My account
-          </Link>
-          <Link
-            className="inline-block py-1 text-[#52617a] transition hover:text-[#2563eb]"
-            to="/terms"
-          >
-            Terms & Conditions
-          </Link>
-        </div>
-
-        {/* Col 4: Newsletter */}
-        <div className="col-span-2 sm:col-span-1 lg:col-span-1">
-          <span className="block text-xs font-bold uppercase tracking-wider text-[#102449]">
-            Stay in the loop
-          </span>
-          <p className="mt-2.5 text-xs sm:text-[11px] leading-relaxed text-[#627187]">
-            New arrivals and good finds, occasionally.
-          </p>
+          <h2 className={`${headingClass} mt-6`}>Stay in the loop</h2>
           <form
-            className="mt-3 flex w-full items-center rounded-lg border border-[#e3e8f0] bg-white p-1 shadow-2xs transition focus-within:border-[#2563eb] focus-within:ring-2 focus-within:ring-[#2563eb]/10"
+            className="mt-3 flex w-full max-w-sm items-center rounded-full border border-white/20 bg-white/10 p-1 transition focus-within:border-[#93c5fd] focus-within:ring-2 focus-within:ring-[#93c5fd]/20"
             onSubmit={submit}
           >
             <input
-              className="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-xs sm:text-[11px] text-[#17233b] outline-none placeholder:text-[#9aa6b8]"
+              className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm text-white outline-none placeholder:text-[#a9b9d3]"
               name="email"
               type="email"
               required
@@ -278,34 +259,25 @@ export default function Footer() {
               placeholder="Your email address"
             />
             <button
-              className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-md bg-[#2563eb] text-white transition hover:bg-[#174fcc] active:scale-95"
+              type="submit"
+              className="grid size-8 shrink-0 place-items-center rounded-full bg-[#2563eb] text-white transition hover:bg-[#1d4ed8] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               aria-label="Subscribe"
             >
-              <ArrowRight size={15} />
+              <ArrowRight size={14} aria-hidden="true" />
             </button>
           </form>
-          {message && (
-            <small
-              className="mt-2 block text-xs font-semibold text-[#16803b]"
-              role="status"
-            >
-              {message}
-            </small>
-          )}
+          <p className="mt-2 min-h-4 text-xs font-semibold text-[#86efac]" role="status">
+            {message}
+          </p>
         </div>
-      </div>
+      </Container>
 
-      {/* Copyright Bar */}
-      <div className="flex flex-col items-center justify-between gap-3 border-t border-[#e9edf3] py-4 text-center sm:flex-row sm:text-left text-xs sm:text-[10px] text-[#8a96a8]">
-        <span>© 2026 Hash Online Store. All rights reserved.</span>
-        <span className="hidden md:inline">
-          Thoughtfully picked. Delivered with care.
-        </span>
-        <div className="flex items-center gap-4">
-          <Link className="transition hover:text-[#2563eb]" to="/terms">
-            Terms & Conditions
-          </Link>
-        </div>
+      {/* Bottom bar: right padding keeps text clear of the floating WhatsApp button */}
+      <div className="bg-[#2563eb] py-3 text-white">
+        <Container className="flex flex-col items-center gap-1 text-center text-xs sm:flex-row sm:justify-between sm:text-left md:pr-20">
+          <span>© 2026 Hash Online Store. All rights reserved.</span>
+          <span className="text-white/80">Payment at checkout: Cash on Delivery</span>
+        </Container>
       </div>
     </footer>
   );

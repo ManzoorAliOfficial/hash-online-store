@@ -13,9 +13,9 @@ export default function ProductGrid({ products, viewMode = "grid" }) {
 
   if (viewMode === "list") {
     return (
-      <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-3">
-        {items.map((product) => (
-          <Reveal className="w-full" key={product.id}>
+      <div className="flex w-full flex-col gap-3">
+        {items.map((product, index) => (
+          <Reveal className="w-full" key={product.id} index={index}>
             <ProductCard product={product} />
           </Reveal>
         ))}
@@ -24,9 +24,9 @@ export default function ProductGrid({ products, viewMode = "grid" }) {
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-[1120px] grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-      {items.map((product) => (
-        <Reveal className="min-w-0" key={product.id}>
+    <div className="grid w-full grid-cols-2 gap-3 sm:gap-4 md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+      {items.map((product, index) => (
+        <Reveal className="min-w-0" key={product.id} index={index}>
           <ProductCard product={product} />
         </Reveal>
       ))}

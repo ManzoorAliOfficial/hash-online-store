@@ -1,75 +1,130 @@
-import { Star, CheckCircle2, Sparkles } from "lucide-react";
-import { testimonials } from "../../data/testimonials";
+import { useMemo } from "react";
+import { CheckCircle2, Star } from "lucide-react";
+import { Link } from "react-router";
+import { useStore } from "../../context/StoreContext";
+import { isMobileAccessory } from "../../utils/homeCatalog";
+
+const formatDate = (value) => {
+  const date = new Date(value);
+  return Number.isFinite(date.getTime())
+    ? date.toLocaleDateString("en-PK", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "";
+};
+
+const initialsFor = (name) =>
+  String(name || "Customer")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("");
 
 export default function Testimonials() {
-  return (
-    <section
-      aria-label="Customer reviews"
-      className="mx-auto mb-[76px] max-w-[1120px] max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-[52px]"
-    >
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-extrabold tracking-[.14em] text-[#2563eb]">
-            <Sparkles size={13} className="text-[#2563eb]" />
-            <span>COMMUNITY PROOF</span>
-          </div>
-          <h2 className="mt-1.5 text-[28px] font-bold tracking-[-.05em] text-[#071a3d] max-[600px]:text-2xl">
-            Trusted by tech lovers nationwide
-          </h2>
-          <p className="mt-1 text-xs sm:text-sm text-[#71809a]">
-            Real feedback and ratings from verified buyers across Pakistan.
-          </p>
-        </div>
-      </div>
+  const { reviews = [], products = [] } = useStore();
+  const verifiedReviews = useMemo(() => {
+    const productById = new Map(products.map((product) => [product.id, product]));
+    return reviews
+      .filter((review) => {
+        const product = productById.get(review.productId);
+        return (
+          review.status === "Published" &&
+          review.verifiedPurchase === true &&
+          isMobileAccessory(product) &&
+          String(review.text || "").trim() &&
+          String(review.name || "").trim()
+        );
+      })
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(0, 3);
+  }, [products, reviews]);
 
-      <div className="grid grid-cols-3 gap-5 max-[900px]:grid-cols-1">
-        {testimonials.map((review) => (
-          <article
-            className="flex flex-col justify-between rounded-2xl border border-[#e5ecf6] bg-white p-6 shadow-[0_4px_16px_rgba(23,35,59,0.03)] transition-all duration-300 hover:-translate-y-1 hover:border-[#2563eb] hover:shadow-[0_12px_28px_rgba(37,99,235,0.08)]"
-            key={review.name}
-          >
-            <div>
-              {/* Stars & Verified Badge */}
-              <div className="flex items-center justify-between">
+  return (
+    <section aria-labelledby="home-reviews-heading">
+      <div className="mb-6">
+        <p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#2563eb]">
+          ✦ &nbsp;Customer feedback
+        </p>
+        <h2
+          id="home-reviews-heading"
+          className="mt-2 text-2xl font-semibold tracking-tight text-[#0f2347] sm:text-3xl"
+        >
+          Customer reviews
+        </h2>
+      </div>
+      {verifiedReviews.length ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+        {verifiedReviews.map((review) => {
+          const product = products.find((item) => item.id === review.productId);
+          const rating = Math.min(5, Math.max(1, Number(review.rating) || 0));
+          const date = formatDate(review.date);
+          return (
+            <article
+              key={review.id}
+              className="flex min-h-[190px] flex-col rounded-2xl border border-[#e5ebf4] bg-white p-4 shadow-[0_8px_24px_-22px_rgba(15,35,71,.28)] sm:p-5"
+            >
+              <div className="flex items-center justify-between gap-2">
                 <div
-                  className="flex gap-1 text-[#f3a522]"
-                  aria-label={`${review.rating} out of 5 stars`}
+                  className="flex items-center gap-0.5 text-amber-500"
+                  aria-label={`${rating} out of 5 stars`}
                 >
-                  {Array.from({ length: review.rating }, (_, index) => (
-                    <Star key={index} size={15} fill="currentColor" />
+                  {Array.from({ length: rating }, (_, index) => (
+                    <Star key={index} size={13} fill="currentColor" />
                   ))}
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-md bg-[#e9f8ed] px-2.5 py-0.5 text-xs font-bold text-[#16803b]">
-                  <CheckCircle2 size={13} /> Verified Buyer
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-semibold text-emerald-700">
+                  <CheckCircle2 size={11} /> Verified buyer
                 </span>
               </div>
-
-              {/* Review Text */}
-              <p className="my-4 text-xs leading-6 text-[#536079] sm:text-sm">
-                “{review.quote}”
+              <p className="mt-4 flex-1 text-xs leading-5 text-[#53627a] sm:text-[13px]">
+                “{review.text}”
               </p>
-            </div>
-
-            {/* Author with Avatar Initials */}
-            <div className="flex items-center gap-3 border-t border-[#edf0f5] pt-3.5">
-              <div className="grid size-9 shrink-0 place-items-center rounded-full bg-[#eff4ff] text-xs font-bold text-[#2563eb]">
-                {review.initials}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <b className="truncate text-xs font-bold text-[#17233b]">
-                    {review.name}
-                  </b>
-                  <span className="text-xs text-[#8491a5]">{review.city}</span>
-                </div>
-                <span className="block truncate text-xs font-semibold text-[#2563eb]">
-                  Purchased: {review.product}
+              <div className="mt-4 flex items-center gap-2.5 border-t border-[#edf0f5] pt-3">
+                <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#eff4ff] text-[10px] font-bold text-[#2563eb]">
+                  {initialsFor(review.name)}
                 </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <b className="truncate text-[11px] font-bold text-[#17233b]">
+                      {review.name}
+                    </b>
+                    {date && (
+                      <time
+                        dateTime={review.date}
+                        className="shrink-0 text-[9px] text-[#8491a5]"
+                      >
+                        {date}
+                      </time>
+                    )}
+                  </div>
+                  <span className="mt-0.5 block truncate text-[9px] font-semibold text-[#2563eb]">
+                    Purchased: {review.productName || product?.name}
+                  </span>
+                </div>
               </div>
-            </div>
-          </article>
-        ))}
-      </div>
+            </article>
+          );
+        })}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-[#e5ebf4] bg-white p-5 sm:p-6">
+          <p className="text-sm font-semibold text-[#17233b]">
+            No verified accessory reviews to show yet.
+          </p>
+          <p className="mt-1.5 text-xs leading-5 text-[#64748b]">
+            Reviews will appear here after the store verifies the purchase.
+          </p>
+          <Link
+            to="/products?collection=mobile-accessories"
+            className="mt-4 inline-flex min-h-10 items-center rounded-lg bg-[#eff4ff] px-4 text-xs font-bold text-[#2563eb] transition hover:bg-[#dce9ff]"
+          >
+            Explore accessories
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

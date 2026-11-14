@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { ArrowRight, CircleHelp, House, ShoppingBag } from "lucide-react";
+import Container from "../components/Layout/Container";
 
 export default function NotFound({ admin = false }) {
   if (admin)
@@ -36,7 +37,7 @@ export default function NotFound({ admin = false }) {
       </section>
     );
   return (
-    <main className="mx-auto grid min-h-[65vh] max-w-[1120px] place-items-center px-4 py-10">
+    <Container as="main" className="grid min-h-[65vh] place-items-center py-10">
       <section className="grid w-full max-w-3xl grid-cols-[.8fr_1.2fr] overflow-hidden rounded-2xl border border-[#e4eaf3] bg-white shadow-[0_18px_45px_rgba(16,36,73,.08)] max-[700px]:grid-cols-1">
         <div
           className="relative grid min-h-[320px] place-items-center overflow-hidden bg-[radial-gradient(circle_at_50%_40%,#dce9ff,#eef3fb_65%)]"
@@ -84,6 +85,6 @@ export default function NotFound({ admin = false }) {
           </Link>
         </div>
       </section>
-    </main>
+    </Container>
   );
 }

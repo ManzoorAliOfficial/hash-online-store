@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router";
 import { Calendar, MapPin, Package } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 import EmptyState from "../components/Common/EmptyState";
 import OrderTimeline from "../components/Orders/OrderTimeline";
 import TrackingStatus from "../components/Orders/TrackingStatus";
@@ -23,11 +24,32 @@ const formatDate = (val) => {
 
 export default function OrderDetails() {
   const { id } = useParams();
-  const { orders } = useStore();
-  const order = orders.find((x) => x.id === id);
+  const { orders, user } = useStore();
+  const foundOrder = orders.find((item) => item.id === id);
+  let guestEmail = "";
+  if (!user) {
+    try {
+      guestEmail = sessionStorage.getItem("hash-guest-email") || "";
+    } catch {
+      // Guest order access is unavailable when session storage is blocked.
+    }
+  }
+  const orderIsVisible =
+    foundOrder &&
+    (user?.role === "admin" ||
+      (user &&
+        (foundOrder.userId === user.id ||
+          (user.email &&
+            foundOrder.details?.email?.toLowerCase() ===
+              user.email.toLowerCase()))) ||
+      (!user &&
+        !foundOrder.userId &&
+        guestEmail &&
+        foundOrder.details?.email?.toLowerCase() === guestEmail.toLowerCase()));
+  const order = orderIsVisible ? foundOrder : null;
 
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
       <PageHeading
         eyebrow="ORDER TRACKING"
         title={order ? `Order #${order.id}` : "Order not found"}
@@ -154,6 +176,6 @@ export default function OrderDetails() {
           to="/orders"
         />
       )}
-    </main>
+    </Container>
   );
 }

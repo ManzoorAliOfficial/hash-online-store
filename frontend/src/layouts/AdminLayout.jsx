@@ -48,7 +48,7 @@ export default function AdminLayout() {
   return (
     <div className="grid min-h-screen grid-cols-[244px_minmax(0,1fr)] bg-[#f4f7fc] max-[800px]:grid-cols-1">
       <AdminSidebar />
-      <main className="min-w-0 p-7 max-[800px]:p-4">
+      <main className="mx-auto w-full min-w-0 max-w-[1600px] p-7 max-[800px]:p-4">
         <header className="mb-7 flex items-center justify-between">
           <div>
             <small className="text-[10px] font-extrabold tracking-[.14em] text-[#2563eb]">

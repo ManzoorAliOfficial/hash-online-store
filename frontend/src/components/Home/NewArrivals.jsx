@@ -1,44 +1,30 @@
 import { useMemo } from "react";
+import { Sparkles } from "lucide-react";
 import { Link } from "react-router";
-import { ArrowRight, Sparkles } from "lucide-react";
-import ProductGrid from "../Products/ProductGrid";
 import { useStore } from "../../context/StoreContext";
+import { getAccessoryCollectionProducts } from "../../utils/homeCatalog";
+import ProductCard from "../Common/ProductCard";
+import AccessoriesLink from "../Common/AccessoriesLink";
 
 export default function NewArrivals() {
   const { products = [] } = useStore();
-
-  // 4 latest newly stocked arrivals
-  const newArrivals = useMemo(() => {
-    return [...products]
-      .slice(-4)
-      .reverse()
-      .map((p) => ({ ...p, badge: "New" }));
-  }, [products]);
-
-  return (
-    <section
-      aria-label="New Arrivals"
-      className="mx-auto mb-[60px] max-w-[1120px] max-[900px]:mx-[5%] max-[600px]:mx-4 max-[600px]:mb-[44px]"
-    >
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-[.14em] text-[#2563eb]">
-            JUST LANDED
-          </span>
-          <h2 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-[-0.03em] text-[#071a3d]">
-            New Arrivals
-          </h2>
-        </div>
-        <Link
-          to="/products"
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#2563eb] transition hover:text-[#174a93] hover:underline"
-        >
-          <span>View all</span>
-          <ArrowRight size={14} />
-        </Link>
-      </div>
-
-      <ProductGrid products={newArrivals} />
-    </section>
+  const items = useMemo(
+    () => getAccessoryCollectionProducts(products, "new-arrivals-accessories"),
+    [products],
   );
+  const visible = items.slice(0, 4);
+  if (!items.length) return null;
+  return <section aria-labelledby="home-new-heading">
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4 sm:mb-8">
+      <div><p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.18em] text-[#2563eb]"><Sparkles size={14} /> Just added to the store</p><h2 id="home-new-heading" className="mt-2 text-2xl font-semibold tracking-tight text-[#0f2347] sm:text-3xl"><Link to="/products?collection=new-arrivals-accessories" className="rounded-sm transition-colors hover:text-[#2563eb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]">New accessories</Link></h2><p className="mt-2 text-sm text-[#64748b]">Recently added items from the current accessory catalog.</p></div>
+    </div>
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+      {visible.map((product) => <div key={product.id} className="min-w-0"><ProductCard product={product} /></div>)}
+    </div>
+    <AccessoriesLink
+      collection="new-arrivals-accessories"
+      totalCount={items.length}
+      visibleCount={visible.length}
+    />
+  </section>;
 }

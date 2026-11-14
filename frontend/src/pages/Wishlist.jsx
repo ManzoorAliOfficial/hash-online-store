@@ -1,5 +1,6 @@
 import { useStore } from "../context/StoreContext";
 import PageHeading from "../components/Common/PageHeading";
+import Container from "../components/Layout/Container";
 import WishlistGrid from "../components/Wishlist/WishlistGrid";
 import EmptyState from "../components/Common/EmptyState";
 
@@ -7,7 +8,7 @@ export default function Wishlist() {
   const { wishlist } = useStore();
 
   return (
-    <main className="mx-auto min-h-[55vh] w-full max-w-[1690px] px-0 py-[70px] max-[1750px]:px-8 max-[900px]:px-[5%] max-[600px]:px-4 max-[600px]:py-8">
+    <Container as="main" className="min-h-[55vh] py-[70px] max-[600px]:py-8">
       <PageHeading eyebrow="SAVED FOR LATER" title="Your wishlist" />
       <WishlistGrid />
       {!wishlist.length && (
@@ -18,6 +19,6 @@ export default function Wishlist() {
           to="/products"
         />
       )}
-    </main>
+    </Container>
   );
 }

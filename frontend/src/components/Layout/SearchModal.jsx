@@ -8,23 +8,38 @@ const money = (val) => `Rs. ${Number(val || 0).toLocaleString()}`;
 export default function SearchModal({ open, onClose }) {
   const { products } = useStore();
   const [query, setQuery] = useState("");
+  const [mounted, setMounted] = useState(open);
+  const [presentOpen, setPresentOpen] = useState(false);
   const inputRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (open) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      const handleKeyDown = (e) => {
-        if (e.key === "Escape") onClose();
-      };
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    } else {
-      setQuery("");
+      setMounted(true);
+      const frame = window.requestAnimationFrame(() => setPresentOpen(true));
+      return () => window.cancelAnimationFrame(frame);
     }
+
+    setPresentOpen(false);
+    setQuery("");
+    const timer = window.setTimeout(() => setMounted(false), 300);
+    return () => window.clearTimeout(timer);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 50);
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   const results = query.trim()
     ? products
@@ -47,14 +62,17 @@ export default function SearchModal({ open, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-[#071a3d]/40 p-4 pt-16 backdrop-blur-xs transition-opacity"
+      data-state={presentOpen ? "open" : "closed"}
+      aria-hidden={!presentOpen}
+      inert={!presentOpen}
+      className="fixed inset-0 z-50 flex items-start justify-center bg-[#071a3d]/40 p-4 pt-16 backdrop-blur-xs transition-opacity duration-300 data-[state=closed]:pointer-events-none data-[state=closed]:opacity-0 data-[state=open]:opacity-100 motion-reduce:transition-none"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#e4eaf3] bg-white shadow-2xl transition-all">
+      <div data-state={presentOpen ? "open" : "closed"} className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[#e4eaf3] bg-white shadow-2xl transition-transform duration-300 ease-out data-[state=closed]:translate-x-full data-[state=open]:translate-x-0 motion-reduce:transition-none">
         {/* Search Input Bar */}
         <form
           onSubmit={handleSubmit}

@@ -92,11 +92,11 @@ export default function ProductInfo({ product }) {
         </div>
         <span className="text-[#8491a5]">·</span>
         <span className="text-[#8491a5] font-medium">
-          ({product.reviews || 0} verified customer reviews)
+          ({product.reviews || 0} review entries in the demo catalog)
         </span>
       </div>
 
-      <div className="my-5 flex items-baseline gap-3">
+      <div className="my-3 flex items-baseline gap-3">
         <strong className="text-2xl font-extrabold text-[#17233b]">
           {money(effectivePrice)}
         </strong>
@@ -107,10 +107,8 @@ export default function ProductInfo({ product }) {
         )}
       </div>
 
-      <p className="text-sm leading-7 text-[#71809a]">{product.description}</p>
-
       {/* Color Swatches */}
-      <div className="mt-5 border-t border-[#edf0f5] pt-4">
+      <div className="mt-3 border-t border-[#edf0f5] pt-3">
         <div className="mb-2 flex items-center justify-between text-xs font-bold text-[#34445f]">
           <span>Color: <span className="font-normal text-[#71809a]">{selectedColor}</span></span>
         </div>
@@ -142,7 +140,7 @@ export default function ProductInfo({ product }) {
 
       {/* Storage / Configuration (for Tech items) */}
       {isTechItem && (
-        <div className="mt-4">
+        <div className="mt-3">
           <div className="mb-2 text-xs font-bold text-[#34445f]">
             Configuration / Storage:
           </div>
@@ -166,7 +164,7 @@ export default function ProductInfo({ product }) {
         </div>
       )}
 
-      <div className="my-4 flex items-center gap-2">
+      <div className="my-3 flex items-center gap-2">
         {inStock ? (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e9f8ed] px-3 py-1 text-xs font-bold text-[#16803b]">
             <CheckCircle size={14} /> In Stock ({product.stock} available)
@@ -179,7 +177,7 @@ export default function ProductInfo({ product }) {
       </div>
 
       {inStock && (
-        <div className="mb-5 flex items-center gap-3">
+        <div className="mb-4 flex items-center gap-3">
           <span className="text-xs font-bold text-[#34445f]">Quantity:</span>
           <div className="flex h-10 items-center rounded-lg border border-[#dce5f3] bg-white">
             <button
@@ -210,15 +208,15 @@ export default function ProductInfo({ product }) {
       <div className="grid gap-2.5 sm:grid-cols-2">
         <button
           type="button"
-          className="inline-flex min-h-[46px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#f97316] px-5 text-sm font-bold text-white shadow-md transition hover:bg-[#ea580c] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#f97316] px-3 text-sm font-bold text-white transition hover:bg-[#ea580c] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
           disabled={!inStock}
           onClick={handleAddToCart}
         >
-          <ShoppingBag size={17} /> Add to Cart
+          <ShoppingBag className="shrink-0" size={17} /> Add to Cart
         </button>
         <button
           type="button"
-          className="inline-flex min-h-[46px] cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-5 text-sm font-bold text-white shadow-xs transition hover:bg-[#1d4ed8] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#2563eb] px-3 text-sm font-bold text-white transition hover:bg-[#1d4ed8] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
           disabled={!inStock}
           onClick={handleBuyNow}
         >
@@ -227,7 +225,7 @@ export default function ProductInfo({ product }) {
       </div>
 
       {/* WhatsApp Quick Order CTA */}
-      <div className="mt-2.5">
+      <div className="mt-2">
         <button
           type="button"
           disabled={!inStock}
@@ -238,7 +236,7 @@ export default function ProductInfo({ product }) {
               : "This product is currently out of stock"
           }
           aria-label="Order on WhatsApp"
-          className="inline-flex min-h-[46px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[#25D366] px-5 text-sm font-bold text-white shadow-md transition duration-200 hover:bg-[#20ba59] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2"
+          className="inline-flex min-h-[44px] w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl bg-[#25D366] px-5 text-sm font-bold text-white transition duration-200 hover:bg-[#20ba59] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2"
         >
           <WhatsAppIcon className="size-5" />
           <span>Order on WhatsApp</span>

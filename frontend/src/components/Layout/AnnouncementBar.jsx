@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { MapPin, PackageCheck, ShieldCheck, Truck, X } from "lucide-react";
+import Container from "./Container";
 
 const STORAGE_KEY = "announcement-bar-dismissed";
 
@@ -63,7 +64,7 @@ export default function AnnouncementBar() {
       <style>{css}</style>
 
       <div className="relative min-h-0 overflow-hidden border-b border-white/10 bg-[#102449] text-[#dce8ff]">
-        <div className="mx-auto flex min-h-[40px] max-w-7xl items-center justify-center px-12 py-2">
+        <Container className="flex min-h-[40px] items-center justify-center py-2">
           {/* Small screens: the plain tagline */}
           <p className="text-center text-xs font-medium leading-snug tracking-[.02em] md:hidden">
             Quality products. Fast delivery. Trusted shopping.
@@ -86,7 +87,7 @@ export default function AnnouncementBar() {
               </li>
             ))}
           </ul>
-        </div>
+        </Container>
 
         <button
           type="button"

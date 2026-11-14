@@ -4,12 +4,18 @@ import { useStore } from "../../context/StoreContext";
 export default function AddressBook() {
   const { addresses, user, addAddress, deleteAddress } = useStore();
   const [value, setValue] = useState("");
+  const [message, setMessage] = useState("");
   const mine = addresses.filter(
     (address) => address.userId === (user?.id || "guest"),
   );
   const submit = (event) => {
     event.preventDefault();
-    if (addAddress(value)) setValue("");
+    if (addAddress(value)) {
+      setValue("");
+      setMessage("Address saved in this browser.");
+    } else {
+      setMessage("Enter an address before saving.");
+    }
   };
   return (
     <section className="rounded-xl border border-[#e4eaf3] bg-white p-5 shadow-[0_8px_24px_rgba(16,36,73,.04)]">
@@ -45,11 +51,13 @@ export default function AddressBook() {
           required
           placeholder="House, street, area, city"
           aria-label="New address"
+          onFocus={() => setMessage("")}
         />
         <button className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[#dce5f3] bg-white px-4 text-xs font-bold text-[#2563eb] transition hover:bg-[#eff4ff]">
           Add address
         </button>
       </form>
+      {message && <p className="mt-2 text-xs text-[#52617a]" role="status">{message}</p>}
     </section>
   );
 }

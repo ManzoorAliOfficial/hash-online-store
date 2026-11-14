@@ -128,7 +128,7 @@ export default function LoginForm() {
       >
         {busy ? (
           <>
-            <Loader2 size={17} className="animate-spin" />
+            <Loader2 size={17} className="motion-safe:animate-spin motion-reduce:animate-none" />
             <span>Signing in...</span>
           </>
         ) : (

@@ -38,7 +38,7 @@ export default function BottomNav() {
         <div className="relative">
           <ShoppingBag size={20} strokeWidth={2.2} />
           {cartCount > 0 && (
-            <span className="absolute -right-2 -top-1.5 grid size-4.5 place-items-center rounded-full bg-[#f97316] text-[10px] font-black text-white shadow-xs">
+            <span key={cartCount} className="absolute -right-2 -top-1.5 grid size-4.5 place-items-center rounded-full bg-[#f97316] text-[10px] font-black text-white shadow-xs motion-safe:animate-pop motion-reduce:animate-none">
               {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}
